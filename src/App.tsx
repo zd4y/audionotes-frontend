@@ -2,6 +2,7 @@ import type { Component } from 'solid-js';
 
 import logo from './logo.svg';
 import styles from './App.module.css';
+import { Button } from '@suid/material';
 
 const App: Component = () => {
   return (
@@ -19,6 +20,7 @@ const App: Component = () => {
         >
           Learn Solid
         </a>
+        <Button variant='contained'>Hello world</Button>
       </header>
     </div>
   );

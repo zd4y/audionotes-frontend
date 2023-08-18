@@ -17,7 +17,7 @@ export async function authorize(
   if (res) {
     const res_data = await res.json();
     return {
-      error: parseError(res.status),
+      error: parseAuthorizeError(res.status),
       accessToken: res_data.access_token,
     };
   } else {
@@ -40,6 +40,16 @@ export async function getUser(
 }
 
 function parseError(statusCode: number) {
+  if (statusCode >= 500) {
+    return "Internal server error"
+  } else if (statusCode >= 200 && statusCode < 300) {
+    return ""
+  } else {
+    return `Error ${statusCode}`
+  }
+}
+
+function parseAuthorizeError(statusCode: number) {
   if (statusCode >= 500) {
     return "Internal server error";
   } else if (statusCode >= 200 && statusCode < 300) {

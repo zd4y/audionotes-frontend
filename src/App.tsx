@@ -1,11 +1,9 @@
-import type { Component } from 'solid-js';
+import type { Component } from "solid-js";
 
-import Auth from './pages/Auth';
+import Auth from "./pages/Auth";
 
 const App: Component = () => {
-  return (
-    <Auth />
-  );
+  return <Auth />;
 };
 
 export default App;

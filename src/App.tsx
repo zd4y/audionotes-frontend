@@ -1,15 +1,17 @@
-import { Show, type Component } from "solid-js";
+import { type Component, Switch, Match } from "solid-js";
 
 import Auth from "./pages/Auth";
 import { useAuth } from "./auth";
-import { Box, CircularProgress } from "@suid/material";
+import { Alert, Box, CircularProgress } from "@suid/material";
 
 const App: Component = () => {
-  const { loading, accessToken } = useAuth();
+  const { loading, error, accessToken } = useAuth();
   return (
-    <Show
-      when={!loading()}
-      fallback={
+    <Switch fallback={<Auth />}>
+      <Match when={error().length > 0}>
+        <Alert severity="error">{error()}</Alert>
+      </Match>
+      <Match when={loading()}>
         <Box
           sx={{
             display: "flex",
@@ -20,13 +22,12 @@ const App: Component = () => {
         >
           <CircularProgress />
         </Box>
-      }
-    >
-      <Show when={accessToken().length > 0} fallback={<Auth />}>
-        Logged in
-      </Show>
-    </Show>
-  );
+      </Match>
+      <Match when={accessToken().length > 0}>
+        Logged In
+      </Match>
+    </Switch>
+  )
 };
 
 export default App;

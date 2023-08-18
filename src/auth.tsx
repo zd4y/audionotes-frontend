@@ -13,18 +13,21 @@ type Data = {
   login: (token: string) => void;
   logout: () => void;
   loading: Accessor<boolean>;
+  error: Accessor<string>;
 };
 
 const AuthContext = createContext<Data>({
   accessToken: () => "",
-  login: (_: string) => {},
-  logout: () => {},
+  login: (_: string) => { },
+  logout: () => { },
   loading: () => true,
+  error: () => "",
 });
 
 export const AuthProvider: ParentComponent = (props) => {
   const [accessToken, setAccessToken] = createSignal<string>("");
   const [loading, setLoading] = createSignal<boolean>(true);
+  const [error, setError] = createSignal<string>("");
 
   onMount(async () => {
     const savedToken = sessionStorage.getItem("access_token");
@@ -32,17 +35,24 @@ export const AuthProvider: ParentComponent = (props) => {
       const { error } = await getUser(savedToken);
       if (error.length == 0) {
         setAccessToken(savedToken);
+        setError("")
       } else {
         setAccessToken("");
+        setError(error)
         sessionStorage.removeItem("access_token");
       }
       setLoading(false);
+    } else {
+      setAccessToken("")
+      setError("")
+      setLoading(false)
     }
   });
 
   const auth = {
     accessToken,
     loading,
+    error,
     login(token: string) {
       sessionStorage.setItem("access_token", token);
       setAccessToken(token);

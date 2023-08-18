@@ -16,9 +16,12 @@ export async function authorize(
   const { res, error } = await request("/user/authorize", "POST", {}, body);
   if (res) {
     const res_data = await res.json();
-    return { error: parseError(res.status), accessToken: res_data.access_token };
+    return {
+      error: parseError(res.status),
+      accessToken: res_data.access_token,
+    };
   } else {
-    return { error, accessToken: null }
+    return { error, accessToken: null };
   }
 }
 
@@ -32,7 +35,7 @@ export async function getUser(
     const user = await res.json();
     return { error: parseError(res.status), user };
   } else {
-    return { error, user: null }
+    return { error, user: null };
   }
 }
 
@@ -61,9 +64,9 @@ async function request(
         ...(headers || {}),
       },
     });
-    return { res }
+    return { res };
   } catch (err) {
-    console.error(err)
-    return { error: "Internal error" }
+    console.error(err);
+    return { error: "Internal error" };
   }
 }

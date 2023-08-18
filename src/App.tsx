@@ -23,11 +23,9 @@ const App: Component = () => {
           <CircularProgress />
         </Box>
       </Match>
-      <Match when={accessToken().length > 0}>
-        Logged In
-      </Match>
+      <Match when={accessToken().length > 0}>Logged In</Match>
     </Switch>
-  )
+  );
 };
 
 export default App;

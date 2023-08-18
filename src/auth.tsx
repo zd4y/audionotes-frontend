@@ -18,8 +18,8 @@ type Data = {
 
 const AuthContext = createContext<Data>({
   accessToken: () => "",
-  login: (_: string) => { },
-  logout: () => { },
+  login: (_: string) => {},
+  logout: () => {},
   loading: () => true,
   error: () => "",
 });
@@ -35,17 +35,17 @@ export const AuthProvider: ParentComponent = (props) => {
       const { error } = await getUser(savedToken);
       if (error.length == 0) {
         setAccessToken(savedToken);
-        setError("")
+        setError("");
       } else {
         setAccessToken("");
-        setError(error)
+        setError(error);
         sessionStorage.removeItem("access_token");
       }
       setLoading(false);
     } else {
-      setAccessToken("")
-      setError("")
-      setLoading(false)
+      setAccessToken("");
+      setError("");
+      setLoading(false);
     }
   });
 

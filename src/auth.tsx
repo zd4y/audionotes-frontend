@@ -19,8 +19,8 @@ type Data = {
 
 const AuthContext = createContext<Data>({
   accessToken: () => "",
-  login: (_: string) => { },
-  logout: () => { },
+  login: (_: string) => {},
+  logout: () => {},
   loading: () => true,
   error: () => "",
 });

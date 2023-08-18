@@ -7,6 +7,7 @@ import {
   useContext,
 } from "solid-js";
 import { getUser } from "./api";
+import { useNavigate } from "@solidjs/router";
 
 type Data = {
   accessToken: Accessor<string>;
@@ -18,8 +19,8 @@ type Data = {
 
 const AuthContext = createContext<Data>({
   accessToken: () => "",
-  login: (_: string) => {},
-  logout: () => {},
+  login: (_: string) => { },
+  logout: () => { },
   loading: () => true,
   error: () => "",
 });
@@ -69,4 +70,15 @@ export const AuthProvider: ParentComponent = (props) => {
 
 export const useAuth = () => {
   return useContext(AuthContext);
+};
+
+export const useAuthenticated = () => {
+  const { accessToken } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  if (accessToken().length == 0) {
+    navigate("/login", { replace: true });
+  }
+
+  return accessToken;
 };

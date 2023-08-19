@@ -13,8 +13,8 @@ const App: Component = () => {
   const { loading, error } = useAuth();
 
   onMount(async () => {
-    await pingApi()
-  })
+    await pingApi();
+  });
 
   return (
     <Switch

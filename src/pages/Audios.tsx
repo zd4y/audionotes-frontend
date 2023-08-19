@@ -32,13 +32,22 @@ const Audios = () => {
 };
 
 const Audio: Component<{ audio: ApiAudio }> = ({ audio }) => {
-  return <Card>
+  const transcribed = audio.transcription && audio.transcription.length > 0;
+  return <Card sx={{ width: 250, height: 250, backgroundColor: transcribed ? "#fff" : "#e0e0e0" }}>
     <CardContent>
-      <Show when={audio.transcription && audio.transcription.length > 0} fallback={<Typography fontStyle="italic">Processing</Typography>}>
-        {audio.transcription}
+      <Show when={transcribed} fallback={<Typography fontStyle="italic">Processing</Typography>}>
+        {cutText(audio.transcription, 310)}
       </Show>
     </CardContent>
   </Card>
+}
+
+const cutText = (text: string, toLen: number) => {
+  if (text.length <= toLen) {
+    return text
+  }
+  let newText = text.slice(0, toLen - 3)
+  return newText + "..."
 }
 
 export default Audios;

@@ -9,6 +9,14 @@ interface AuthorizeData {
   password: string;
 }
 
+export async function pingApi(): Promise<void> {
+  const { res, error } = await request("/");
+  if (!res || res.status === 503 || error) {
+    await sleep(1000);
+    return await pingApi()
+  }
+}
+
 export async function authorize(
   data: AuthorizeData,
 ): Promise<{ error: string; accessToken: string | null }> {
@@ -144,3 +152,5 @@ async function request(
     return { error: "Internal error" };
   }
 }
+
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));

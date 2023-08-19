@@ -1,15 +1,21 @@
-import { type Component, Switch, Match, lazy } from "solid-js";
+import { type Component, Switch, Match, lazy, onMount } from "solid-js";
 
 import { useAuth } from "./auth";
 import { Alert, Box, CircularProgress } from "@suid/material";
 import { Route, Router, Routes } from "@solidjs/router";
 import Notes from "./pages/Notes";
+import { pingApi } from "./api";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 const App: Component = () => {
   const { loading, error } = useAuth();
+
+  onMount(async () => {
+    await pingApi()
+  })
+
   return (
     <Switch
       fallback={

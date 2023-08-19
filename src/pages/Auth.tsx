@@ -41,30 +41,28 @@ const Auth: Component = () => {
         sx={{
           display: "flex",
           justifyContent: "center",
-          mt: 10,
+          mt: 20,
         }}
       >
-        <Stack sx={{ width: "30ch" }}>
-          <Typography variant="h4" mb={2}>
-            AudioNotes
-          </Typography>
+        <Stack width="30ch" gap={2}>
+          <Typography variant="h4">AudioNotes</Typography>
           <Stack component="form" gap={2} onSubmit={onSubmit}>
             <TextField
               required
+              type="email"
               name="email"
               label="email"
               value={email()}
               onChange={(_, value) => setEmail(value)}
-              type="email"
               sx={{ bgcolor: "#fff" }}
             />
             <TextField
               required
+              type="password"
               name="password"
               label="password"
               value={password()}
               onChange={(_, value) => setPassword(value)}
-              type="password"
               sx={{ bgcolor: "#fff" }}
             />
             <Show when={error().length > 0}>
@@ -76,7 +74,7 @@ const Auth: Component = () => {
                   Log in
                 </Button>
                 <Link href="/reset-password" component={A}>
-                  forgot password?
+                  Forgot password?
                 </Link>
               </Stack>
             </Show>

@@ -18,7 +18,7 @@ export async function authorize(
     const res_data = await res.json();
     return {
       error: parseAuthorizeError(res.status),
-      accessToken: res_data.access_token,
+      accessToken: res_data.access_token || null,
     };
   } else {
     return { error, accessToken: null };
@@ -33,19 +33,83 @@ export async function getUser(
   });
   if (res) {
     const user = await res.json();
-    return { error: parseError(res.status), user };
+    return { error: parseError(res.status), user: user || null };
   } else {
     return { error, user: null };
   }
 }
 
+interface ResetPasswordData {
+  user_id: number;
+  token: string;
+  new_password: string;
+}
+
+export async function resetPassword(data: ResetPasswordData): Promise<{
+  reset: boolean;
+  error: string;
+  suggestions: string[];
+  warning: string;
+}> {
+  const body = JSON.stringify(data);
+  const { res, error } = await request("/user/reset-password", "PUT", {}, body);
+  if (res) {
+    if (res.status === 204) {
+      return { reset: true, error: "", suggestions: [], warning: "" };
+    } else if (res.status === 400) {
+      const resData = await res.json();
+      return {
+        reset: false,
+        error: resData.error,
+        suggestions: resData.suggestions,
+        warning: resData.warning,
+      };
+    } else if (res.status === 404) {
+      return {
+        reset: false,
+        error: "Token doesn't exist or is expired",
+        warning: "",
+        suggestions: [],
+      };
+    }
+    return {
+      reset: false,
+      error: parseError(res.status),
+      suggestions: [],
+      warning: "",
+    };
+  } else {
+    return { reset: false, error, suggestions: [], warning: "" };
+  }
+}
+
+export async function requestResetPassword(
+  email: string,
+): Promise<{ sent: boolean; error: string }> {
+  const body = JSON.stringify({ email });
+  const { res, error } = await request(
+    "/user/request-reset-password",
+    "PUT",
+    {},
+    body,
+  );
+  if (res) {
+    if (res.status === 202) {
+      return { error: "", sent: true };
+    }
+    return { error: parseError(res.status), sent: false };
+  } else {
+    return { error, sent: false };
+  }
+}
+
 function parseError(statusCode: number) {
   if (statusCode >= 500) {
-    return "Internal server error"
+    return "Internal server error";
   } else if (statusCode >= 200 && statusCode < 300) {
-    return ""
+    return "";
   } else {
-    return `Error ${statusCode}`
+    return `Error ${statusCode}`;
   }
 }
 

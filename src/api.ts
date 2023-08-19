@@ -52,13 +52,17 @@ export async function getUser(
   }
 }
 
-export async function getAudios(accessToken: string): Promise<{ audios: Audio[], error: string }> {
-  const { res, error } = await request("/audios", "GET", { Authorization: `Bearer ${accessToken}` })
+export async function getAudios(
+  accessToken: string,
+): Promise<{ audios: Audio[]; error: string }> {
+  const { res, error } = await request("/audios", "GET", {
+    Authorization: `Bearer ${accessToken}`,
+  });
   if (res) {
     const audios = await res.json();
-    return { audios, error: parseError(res.status) }
+    return { audios, error: parseError(res.status) };
   } else {
-    return { audios: [], error }
+    return { audios: [], error };
   }
 }
 

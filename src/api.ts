@@ -1,6 +1,11 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-interface User {
+export interface Audio {
+  id: number;
+  transcription: string;
+}
+
+export interface User {
   email: string;
 }
 
@@ -44,6 +49,16 @@ export async function getUser(
     return { error: parseError(res.status), user: user || null };
   } else {
     return { error, user: null };
+  }
+}
+
+export async function getAudios(accessToken: string): Promise<{ audios: Audio[], error: string }> {
+  const { res, error } = await request("/audios", "GET", { Authorization: `Bearer ${accessToken}` })
+  if (res) {
+    const audios = await res.json();
+    return { audios, error: parseError(res.status) }
+  } else {
+    return { audios: [], error }
   }
 }
 

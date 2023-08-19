@@ -3,7 +3,7 @@ import { type Component, Switch, Match, lazy, onMount } from "solid-js";
 import { useAuth } from "./auth";
 import { Alert, Box, CircularProgress } from "@suid/material";
 import { Route, Router, Routes } from "@solidjs/router";
-import Notes from "./pages/Notes";
+import Audios from "./pages/Audios";
 import { pingApi } from "./api";
 
 const Auth = lazy(() => import("./pages/Auth"));
@@ -21,7 +21,7 @@ const App: Component = () => {
       fallback={
         <Router>
           <Routes>
-            <Route path="/" component={Notes} />
+            <Route path="/" component={Audios} />
             <Route path="/login" component={Auth} />
             <Route path="/reset-password" component={ResetPassword} />
           </Routes>

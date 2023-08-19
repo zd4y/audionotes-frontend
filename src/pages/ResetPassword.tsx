@@ -68,9 +68,9 @@ const ResetPassword = () => {
 
   return (
     <Container sx={{ display: "flex", justifyContent: "center", mt: 20 }}>
-      <Stack gap={2} width="30ch">
+      <Stack spacing={2} width="30ch">
         <Typography variant="h4">AudioNotes</Typography>
-        <Stack component="form" gap={2} onSubmit={onSubmit}>
+        <Stack component="form" spacing={2} onSubmit={onSubmit}>
           <Show
             when={searchParams.token}
             fallback={
@@ -125,7 +125,7 @@ const ResetPassword = () => {
             <Show when={successMsg()}>
               <Alert severity="success">{successMsg()}</Alert>
             </Show>
-            <Stack flexDirection="row" alignItems="center" gap={1}>
+            <Stack flexDirection="row" alignItems="center" spacing={1}>
               <Button variant="contained" type="submit">
                 Reset password
               </Button>

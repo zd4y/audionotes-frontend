@@ -44,9 +44,9 @@ const Auth: Component = () => {
           mt: 20,
         }}
       >
-        <Stack width="30ch" gap={2}>
+        <Stack width="30ch" spacing={2}>
           <Typography variant="h4">AudioNotes</Typography>
-          <Stack component="form" gap={2} onSubmit={onSubmit}>
+          <Stack component="form" spacing={2} onSubmit={onSubmit}>
             <TextField
               required
               type="email"
@@ -69,7 +69,7 @@ const Auth: Component = () => {
               <Alert severity="error">{error()}</Alert>
             </Show>
             <Show when={!loading()} fallback={<LinearProgress />}>
-              <Stack direction="row" gap={1} alignItems="center">
+              <Stack direction="row" spacing={1} alignItems="center">
                 <Button type="submit" variant="contained">
                   Log in
                 </Button>

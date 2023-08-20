@@ -10,21 +10,26 @@ import { useAuthenticated } from "../auth";
 import { getAudios, Audio as ApiAudio, newAudio } from "../api";
 import {
   Alert,
+  Box,
   Button,
   Card,
   CardContent,
   Container,
   Dialog,
   DialogActions,
+  DialogContent,
   DialogTitle,
   Fab,
   Grid,
   Link,
   Typography,
+  useTheme,
 } from "@suid/material";
 import PageProgress from "../components/PageProgress";
 import { A } from "@solidjs/router";
 import { Mic, Stop } from "@suid/icons-material";
+import WaveSurfer from "wavesurfer.js";
+import RecordPlugin from "wavesurfer.js/plugins/record";
 
 const Audios = () => {
   const accessToken = useAuthenticated();
@@ -149,32 +154,41 @@ const RecordAudio: Component<{
   onClose: () => void;
   onSave: (audioBlob: Blob) => void;
 }> = (props) => {
-  const [chunks, setChunks] = createSignal<Blob[]>([]);
   const [blob, setBlob] = createSignal<Blob | null>(null);
   const [audioBlobUrl, setAudioBlobUrl] = createSignal("");
+  const theme = useTheme();
 
-  let mediaRecorder: MediaRecorder | null = null;
+  let container: HTMLDivElement | undefined;
+  let waveSurfer: WaveSurfer | null = null;
+  let record: RecordPlugin;
 
-  createEffect(async () => {
+  createEffect(() => {
     if (!props.open || !props.recording) {
       stopRecording();
       return;
     }
 
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder = new MediaRecorder(stream);
-      mediaRecorder.start();
-      mediaRecorder.ondataavailable = (e) => {
-        setChunks((oldChunks) => [...oldChunks, e.data]);
-      };
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks(), { type: "audio/ogg; codecs=opus" });
-        setBlob(blob);
-        setChunks([]);
-        setAudioBlobUrl(URL.createObjectURL(blob));
-      };
-    }
+    if (!container) return;
+
+    setBlob(null);
+    setAudioBlobUrl("");
+
+    waveSurfer = WaveSurfer.create({
+      container,
+      waveColor: theme.palette.primary.main,
+      height: 100,
+      normalize: true,
+      barWidth: 4,
+      barGap: 1,
+      barRadius: 2,
+    });
+    record = waveSurfer.registerPlugin(RecordPlugin.create());
+    record.on("record-end", (blob: Blob) => {
+      const recordedUrl = URL.createObjectURL(blob);
+      setAudioBlobUrl(recordedUrl);
+      setBlob(blob);
+    });
+    record.startRecording();
   });
 
   const handleClose = () => {
@@ -187,21 +201,27 @@ const RecordAudio: Component<{
   };
 
   const stopRecording = () => {
-    if (mediaRecorder === null) return;
-    mediaRecorder.stop();
-    mediaRecorder.stream.getTracks().forEach((track) => track.stop());
-    mediaRecorder = null;
+    record?.stopRecording();
+    record?.stopMic();
+    record = null;
+    waveSurfer?.destroy();
+    waveSurfer = null;
   };
 
   return (
-    <Dialog open={props.open} onClose={handleClose}>
+    <Dialog open={props.open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Recording audio</DialogTitle>
-      <Show when={audioBlobUrl()}>
-        <audio controls src={audioBlobUrl()} />
-        <DialogActions>
+      <DialogContent>
+        <div ref={container} />
+        <Show when={audioBlobUrl()}>
+          <audio controls src={audioBlobUrl()} />
+        </Show>
+      </DialogContent>
+      <DialogActions>
+        <Show when={audioBlobUrl()}>
           <Button onClick={handleSave}>Save</Button>
-        </DialogActions>
-      </Show>
+        </Show>
+      </DialogActions>
     </Dialog>
   );
 };

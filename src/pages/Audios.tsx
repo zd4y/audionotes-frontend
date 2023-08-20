@@ -1,12 +1,22 @@
-import { Component, For, Show, createSignal, onMount } from "solid-js";
+import {
+  Component,
+  For,
+  Show,
+  createEffect,
+  createSignal,
+  onMount,
+} from "solid-js";
 import { useAuthenticated } from "../auth";
-import { getAudios, Audio as ApiAudio } from "../api";
+import { getAudios, Audio as ApiAudio, newAudio } from "../api";
 import {
   Alert,
-  Box,
+  Button,
   Card,
   CardContent,
   Container,
+  Dialog,
+  DialogActions,
+  DialogTitle,
   Fab,
   Grid,
   Link,
@@ -14,20 +24,47 @@ import {
 } from "@suid/material";
 import PageProgress from "../components/PageProgress";
 import { A } from "@solidjs/router";
-import { Mic } from "@suid/icons-material";
+import { Mic, Stop } from "@suid/icons-material";
 
 const Audios = () => {
   const accessToken = useAuthenticated();
   const [audios, setAudios] = createSignal<ApiAudio[]>([]);
   const [error, setError] = createSignal("");
   const [loading, setLoading] = createSignal(true);
+  const [recordingAudio, setRecordingAudio] = createSignal(false);
+  const [recordingAudioOpen, setRecordingAudioOpen] = createSignal(false);
 
   onMount(async () => {
-    let { audios, error } = await getAudios(accessToken());
-    setLoading(false);
-    setError(error);
-    setAudios(audios);
+    await callGetAudios();
   });
+
+  const callGetAudios = async () => {
+    let { audios, error } = await getAudios(accessToken());
+    setAudios(audios);
+    setError(error);
+    setLoading(false);
+  };
+
+  const onRecordingBtnClick = () => {
+    setRecordingAudio((recording) => !recording);
+    setRecordingAudioOpen(true);
+  };
+
+  const onRecordingClose = () => {
+    setRecordingAudio(false);
+    setRecordingAudioOpen(false);
+  };
+
+  const onSaveRecording = async (blob: Blob) => {
+    const { error } = await newAudio(accessToken(), blob);
+    if (error.length > 0) {
+      setError(error);
+    } else {
+      await callGetAudios();
+    }
+    setRecordingAudio(false);
+    setRecordingAudioOpen(false);
+  };
 
   return (
     <>
@@ -50,17 +87,33 @@ const Audios = () => {
           </Grid>
         </Container>
       </Show>
-      <Fab color="primary" aria-label="record" sx={{ position: "absolute", right: 50, bottom: 50 }}>
-        <Mic />
+      <Fab
+        onClick={onRecordingBtnClick}
+        color={recordingAudio() ? "error" : "primary"}
+        aria-label="record"
+        sx={{ position: "absolute", right: 50, bottom: 50, zIndex: 10000 }}
+      >
+        {recordingAudio() ? <Stop /> : <Mic />}
       </Fab>
+      <RecordAudio
+        open={recordingAudioOpen()}
+        recording={recordingAudio()}
+        onClose={onRecordingClose}
+        onSave={onSaveRecording}
+      />
     </>
   );
 };
 
-const Audio: Component<{ audio: ApiAudio }> = ({ audio }) => {
-  const transcribed = audio.transcription && audio.transcription.length > 0;
+const Audio: Component<{ audio: ApiAudio }> = (props) => {
+  const transcribed =
+    props.audio.transcription && props.audio.transcription.length > 0;
   return (
-    <Link component={A} href={`/${audio.id}`} sx={{ textDecoration: "none" }}>
+    <Link
+      component={A}
+      href={`/${props.audio.id}`}
+      sx={{ textDecoration: "none" }}
+    >
       <Card
         sx={{
           width: 250,
@@ -73,11 +126,77 @@ const Audio: Component<{ audio: ApiAudio }> = ({ audio }) => {
             when={transcribed}
             fallback={<Typography fontStyle="italic">Processing</Typography>}
           >
-            {cutText(audio.transcription, 310)}
+            {cutText(props.audio.transcription, 310)}
           </Show>
         </CardContent>
       </Card>
     </Link>
+  );
+};
+
+const RecordAudio: Component<{
+  open: boolean;
+  recording: boolean;
+  onClose: () => void;
+  onSave: (audioBlob: Blob) => void;
+}> = (props) => {
+  const [mediaRecorder, setMediaRecorder] = createSignal<MediaRecorder | null>(
+    null,
+  );
+  const [chunks, setChunks] = createSignal<Blob[]>([]);
+  const [blob, setBlob] = createSignal<Blob | null>(null);
+  const [audioBlobUrl, setAudioBlobUrl] = createSignal("");
+
+  createEffect(async () => {
+    if (!props.open || !props.recording) {
+      stopRecording();
+      return;
+    }
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      setMediaRecorder(mediaRecorder);
+      mediaRecorder.start();
+      mediaRecorder.ondataavailable = (e) => {
+        setChunks((oldChunks) => [...oldChunks, e.data]);
+      };
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks(), { type: "audio/ogg; codecs=opus" });
+        setBlob(blob);
+        setChunks([]);
+        setAudioBlobUrl(URL.createObjectURL(blob));
+      };
+    }
+  });
+
+  const handleClose = () => {
+    stopRecording();
+    props.onClose();
+  };
+
+  const handleSave = () => {
+    props.onSave(blob()!);
+  };
+
+  const stopRecording = () => {
+    mediaRecorder()?.stop();
+    mediaRecorder()
+      ?.stream.getTracks()
+      .forEach((track) => track.stop());
+    setMediaRecorder(null);
+  };
+
+  return (
+    <Dialog open={props.open} onClose={handleClose}>
+      <DialogTitle>Recording audio</DialogTitle>
+      <Show when={audioBlobUrl()}>
+        <audio controls src={audioBlobUrl()} />
+        <DialogActions>
+          <Button onClick={handleSave}>Save</Button>
+        </DialogActions>
+      </Show>
+    </Dialog>
   );
 };
 

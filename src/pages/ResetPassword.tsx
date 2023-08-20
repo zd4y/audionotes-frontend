@@ -28,8 +28,8 @@ const ResetPassword = () => {
 
   const onSubmit = async (event: Event) => {
     event.preventDefault();
-    setSuccessMsg("");
     setLoading(true);
+    setSuccessMsg("");
     setError("");
     setWarning("");
     setSuggestions([]);

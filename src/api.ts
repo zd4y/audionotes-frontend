@@ -98,6 +98,24 @@ export async function getAudioFile(
   }
 }
 
+export async function newAudio(
+  accessToken: string,
+  blob: Blob,
+): Promise<{ error: string }> {
+  const { res, error } = await request(
+    `/audios`,
+    "POST",
+    {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    blob,
+  );
+  if (res) {
+    return { error: parseError(res.status) };
+  }
+  return { error };
+}
+
 interface ResetPasswordData {
   user_id: number;
   token: string;
@@ -186,16 +204,18 @@ async function request(
   path: string,
   method?: string,
   headers?: { [key: string]: string },
-  body?: string,
+  body?: BodyInit,
+  isJson?: boolean,
 ) {
+  const headers2 = headers || {};
+  if (isJson !== false) {
+    headers2["Content-Type"] = "application/json";
+  }
   try {
     const res = await fetch(`${BASE_URL}/api${path}`, {
       method,
       body,
-      headers: {
-        "Content-Type": "application/json",
-        ...(headers || {}),
-      },
+      headers: headers2,
     });
     return { res };
   } catch (err) {

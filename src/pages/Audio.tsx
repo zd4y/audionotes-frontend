@@ -23,9 +23,9 @@ const Audio = () => {
   onMount(async () => {
     const audioId = parseInt(params.id);
     const { audio, error } = await getAudio(accessToken(), audioId);
-    setLoading(false);
     setError(error);
     setAudio(audio);
+    setLoading(false);
     if (error.length > 0) return;
     const { blob, error: error2 } = await getAudioFile(accessToken(), audioId);
     setError(error2);

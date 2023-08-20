@@ -149,12 +149,11 @@ const RecordAudio: Component<{
   onClose: () => void;
   onSave: (audioBlob: Blob) => void;
 }> = (props) => {
-  const [mediaRecorder, setMediaRecorder] = createSignal<MediaRecorder | null>(
-    null,
-  );
   const [chunks, setChunks] = createSignal<Blob[]>([]);
   const [blob, setBlob] = createSignal<Blob | null>(null);
   const [audioBlobUrl, setAudioBlobUrl] = createSignal("");
+
+  let mediaRecorder: MediaRecorder | null = null;
 
   createEffect(async () => {
     if (!props.open || !props.recording) {
@@ -164,8 +163,7 @@ const RecordAudio: Component<{
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      setMediaRecorder(mediaRecorder);
+      mediaRecorder = new MediaRecorder(stream);
       mediaRecorder.start();
       mediaRecorder.ondataavailable = (e) => {
         setChunks((oldChunks) => [...oldChunks, e.data]);
@@ -189,11 +187,10 @@ const RecordAudio: Component<{
   };
 
   const stopRecording = () => {
-    mediaRecorder()?.stop();
-    mediaRecorder()
-      ?.stream.getTracks()
-      .forEach((track) => track.stop());
-    setMediaRecorder(null);
+    if (mediaRecorder === null) return;
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach((track) => track.stop());
+    mediaRecorder = null;
   };
 
   return (

@@ -128,8 +128,8 @@ const Audio: Component<{ audio: ApiAudio }> = (props) => {
     >
       <Card
         sx={{
-          width: 250,
-          height: 250,
+          width: { xs: 150, md: 250 },
+          height: { xs: 150, md: 250 },
           backgroundColor: props.audio.transcription ? "#fff" : "#e0e0e0",
         }}
       >

@@ -38,7 +38,7 @@ const Auth: Component = () => {
 
   return (
     <Show
-      when={accessToken().length == 0}
+      when={!accessToken()}
       fallback={<Navigate href={(location.state as any)?.next || "/"} />}
     >
       <Container

@@ -120,8 +120,6 @@ const Audios = () => {
 };
 
 const Audio: Component<{ audio: ApiAudio }> = (props) => {
-  const transcribed =
-    props.audio.transcription && props.audio.transcription.length > 0;
   return (
     <Link
       component={A}
@@ -132,12 +130,12 @@ const Audio: Component<{ audio: ApiAudio }> = (props) => {
         sx={{
           width: 250,
           height: 250,
-          backgroundColor: transcribed ? "#fff" : "#e0e0e0",
+          backgroundColor: props.audio.transcription ? "#fff" : "#e0e0e0",
         }}
       >
         <CardContent>
           <Show
-            when={transcribed}
+            when={props.audio.transcription}
             fallback={<Typography fontStyle="italic">Processing</Typography>}
           >
             {cutText(props.audio.transcription, 310)}

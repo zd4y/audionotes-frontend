@@ -1,7 +1,15 @@
-import { type Component, Switch, Match, lazy, onMount } from "solid-js";
+import {
+  type Component,
+  Switch,
+  Match,
+  lazy,
+  onMount,
+  createSignal,
+  Show,
+} from "solid-js";
 
 import { useAuth } from "./auth";
-import { Alert } from "@suid/material";
+import { Alert, Container } from "@suid/material";
 import { Route, Router, Routes } from "@solidjs/router";
 import Audios from "./pages/Audios";
 import { pingApi } from "./api";
@@ -13,31 +21,38 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 const App: Component = () => {
   const { loading, error } = useAuth();
+  const [serverAvailable, setServerAvailable] = createSignal(true);
 
   onMount(async () => {
-    await pingApi();
+    const serverAvailable = await pingApi(3);
+    setServerAvailable(serverAvailable);
   });
 
   return (
-    <Switch
-      fallback={
-        <Router>
-          <Routes>
-            <Route path="/" component={Audios} />
-            <Route path="/:id" component={Audio} />
-            <Route path="/login" component={Auth} />
-            <Route path="/reset-password" component={ResetPassword} />
-          </Routes>
-        </Router>
-      }
+    <Show
+      when={serverAvailable()}
+      fallback={<Container sx={{ mt: 15 }}><Alert severity="error">Server unavailable</Alert></Container>}
     >
-      <Match when={error().length > 0}>
-        <Alert severity="error">{error()}</Alert>
-      </Match>
-      <Match when={loading()}>
-        <PageProgress />
-      </Match>
-    </Switch>
+      <Switch
+        fallback={
+          <Router>
+            <Routes>
+              <Route path="/" component={Audios} />
+              <Route path="/:id" component={Audio} />
+              <Route path="/login" component={Auth} />
+              <Route path="/reset-password" component={ResetPassword} />
+            </Routes>
+          </Router>
+        }
+      >
+        <Match when={error().length > 0}>
+          <Alert severity="error">{error()}</Alert>
+        </Match>
+        <Match when={loading()}>
+          <PageProgress />
+        </Match>
+      </Switch>
+    </Show>
   );
 };
 

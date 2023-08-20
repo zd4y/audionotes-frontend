@@ -201,11 +201,9 @@ const RecordAudio: Component<{
   };
 
   const stopRecording = () => {
-    record?.stopRecording();
-    record?.stopMic();
-    record = null;
     waveSurfer?.destroy();
     waveSurfer = null;
+    record = null;
   };
 
   return (

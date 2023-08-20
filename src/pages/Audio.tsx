@@ -26,10 +26,10 @@ const Audio = () => {
     setError(error);
     setAudio(audio);
     setLoading(false);
-    if (error.length > 0) return;
+    if (error) return;
     const { blob, error: error2 } = await getAudioFile(accessToken(), audioId);
     setError(error2);
-    if (error2.length > 0 || blob === null) return;
+    if (error2 || blob === null) return;
     const blobUrl = URL.createObjectURL(blob);
     setAudioBlobUrl(blobUrl);
   });
@@ -37,7 +37,7 @@ const Audio = () => {
   return (
     <Show when={!loading()} fallback={<PageProgress />}>
       <Container sx={{ mt: 15, mb: 15 }}>
-        <Show when={error().length > 0}>
+        <Show when={error()}>
           <Alert severity="error">{error()}</Alert>
         </Show>
         <Show when={audio()}>
@@ -49,7 +49,7 @@ const Audio = () => {
               <Card>
                 <CardContent>
                   <Show
-                    when={audio().transcription.length > 0}
+                    when={audio().transcription}
                     fallback={
                       <Typography fontStyle="italic">Processing</Typography>
                     }

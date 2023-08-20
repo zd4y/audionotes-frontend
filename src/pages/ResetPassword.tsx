@@ -102,10 +102,10 @@ const ResetPassword = () => {
               onChange={(_, value) => setConfirmNewPassword(value)}
               sx={{ bgcolor: "#fff" }}
             />
-            <Show when={warning().length > 0}>
+            <Show when={warning()}>
               <Alert severity="warning">{warning()}</Alert>
             </Show>
-            <Show when={suggestions().length > 0}>
+            <Show when={suggestions()}>
               <Alert severity="info">
                 <AlertTitle>Suggestions</AlertTitle>
                 <For each={suggestions()}>
@@ -119,7 +119,7 @@ const ResetPassword = () => {
             </Show>
           </Show>
           <Show when={!loading()} fallback={<LinearProgress />}>
-            <Show when={error().length > 0}>
+            <Show when={error()}>
               <Alert severity="error">{error()}</Alert>
             </Show>
             <Show when={successMsg()}>

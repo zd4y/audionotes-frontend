@@ -49,7 +49,7 @@ const App: Component = () => {
           </Router>
         }
       >
-        <Match when={error().length > 0}>
+        <Match when={error()}>
           <Alert severity="error">{error()}</Alert>
         </Match>
         <Match when={loading()}>

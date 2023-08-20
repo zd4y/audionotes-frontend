@@ -62,7 +62,7 @@ const Audios = () => {
 
   const onSaveRecording = async (blob: Blob) => {
     const { error } = await newAudio(accessToken(), blob);
-    if (error.length > 0) {
+    if (error) {
       setError(error);
     } else {
       await callGetAudios();

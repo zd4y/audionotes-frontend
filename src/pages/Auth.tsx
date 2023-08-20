@@ -65,7 +65,7 @@ const Auth: Component = () => {
               onChange={(_, value) => setPassword(value)}
               sx={{ bgcolor: "#fff" }}
             />
-            <Show when={error().length > 0}>
+            <Show when={error()}>
               <Alert severity="error">{error()}</Alert>
             </Show>
             <Show when={!loading()} fallback={<LinearProgress />}>

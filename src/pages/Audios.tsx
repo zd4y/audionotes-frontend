@@ -7,12 +7,14 @@ import {
   Card,
   CardContent,
   Container,
+  Fab,
   Grid,
   Link,
   Typography,
 } from "@suid/material";
 import PageProgress from "../components/PageProgress";
 import { A } from "@solidjs/router";
+import { Mic } from "@suid/icons-material";
 
 const Audios = () => {
   const accessToken = useAuthenticated();
@@ -28,25 +30,30 @@ const Audios = () => {
   });
 
   return (
-    <Show when={!loading()} fallback={<PageProgress />}>
-      <Container sx={{ mt: 15, mb: 15 }}>
-        <Show when={error()}>
-          <Alert severity="error">{error()}</Alert>
-        </Show>
-        <Grid container spacing={2}>
-          <For
-            each={audios()}
-            fallback={<Typography>No audios found.</Typography>}
-          >
-            {(audio) => (
-              <Grid item>
-                <Audio audio={audio} />
-              </Grid>
-            )}
-          </For>
-        </Grid>
-      </Container>
-    </Show>
+    <>
+      <Show when={!loading()} fallback={<PageProgress />}>
+        <Container sx={{ mt: 15, mb: 15 }}>
+          <Show when={error()}>
+            <Alert severity="error">{error()}</Alert>
+          </Show>
+          <Grid container spacing={2}>
+            <For
+              each={audios()}
+              fallback={<Typography>No audios found.</Typography>}
+            >
+              {(audio) => (
+                <Grid item>
+                  <Audio audio={audio} />
+                </Grid>
+              )}
+            </For>
+          </Grid>
+        </Container>
+      </Show>
+      <Fab color="primary" aria-label="record" sx={{ position: "absolute", right: 50, bottom: 50 }}>
+        <Mic />
+      </Fab>
+    </>
   );
 };
 

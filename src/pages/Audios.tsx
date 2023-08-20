@@ -177,7 +177,7 @@ const RecordAudio: Component<{
       height: 100,
       normalize: true,
       barWidth: 4,
-      barGap: 1,
+      barGap: 4,
       barRadius: 2,
     });
     record = waveSurfer.registerPlugin(RecordPlugin.create());

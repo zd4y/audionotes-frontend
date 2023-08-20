@@ -76,7 +76,11 @@ const Audios = () => {
           <Grid container spacing={2}>
             <For
               each={audios()}
-              fallback={<Typography>No audios found.</Typography>}
+              fallback={
+                <Grid item>
+                  <Typography>No audios found.</Typography>
+                </Grid>
+              }
             >
               {(audio) => (
                 <Grid item>

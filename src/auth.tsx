@@ -2,12 +2,13 @@ import {
   Accessor,
   ParentComponent,
   createContext,
+  createEffect,
   createSignal,
   onMount,
   useContext,
 } from "solid-js";
 import { getUser } from "./api";
-import { useNavigate } from "@solidjs/router";
+import { useLocation, useNavigate } from "@solidjs/router";
 
 type Data = {
   accessToken: Accessor<string>;
@@ -75,10 +76,14 @@ export const useAuth = () => {
 export const useAuthenticated = () => {
   const { accessToken } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  if (accessToken().length == 0) {
-    navigate("/login", { replace: true });
-  }
+  createEffect(() => {
+    const next = location.pathname + location.search;
+    if (!accessToken()) {
+      navigate("/login", { replace: true, state: { next } });
+    }
+  });
 
   return accessToken;
 };

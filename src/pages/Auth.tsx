@@ -11,7 +11,7 @@ import {
 import { Component, Show, createSignal } from "solid-js";
 import { authorize } from "../api";
 import { useAuth } from "../auth";
-import { A, Navigate } from "@solidjs/router";
+import { A, Navigate, useLocation } from "@solidjs/router";
 
 const Auth: Component = () => {
   const [email, setEmail] = createSignal("");
@@ -19,6 +19,7 @@ const Auth: Component = () => {
   const [error, setError] = createSignal("");
   const [loading, setLoading] = createSignal(false);
   const { login, accessToken } = useAuth();
+  const location = useLocation();
 
   const onSubmit = async (e: Event) => {
     e.preventDefault();
@@ -36,7 +37,10 @@ const Auth: Component = () => {
   };
 
   return (
-    <Show when={accessToken().length == 0} fallback={<Navigate href="/" />}>
+    <Show
+      when={accessToken().length == 0}
+      fallback={<Navigate href={(location.state as any)?.next || "/"} />}
+    >
       <Container
         sx={{
           display: "flex",

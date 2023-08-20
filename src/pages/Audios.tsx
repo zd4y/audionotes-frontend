@@ -6,11 +6,13 @@ import {
   Box,
   Card,
   CardContent,
-  CircularProgress,
   Container,
   Grid,
+  Link,
   Typography,
 } from "@suid/material";
+import PageProgress from "../components/PageProgress";
+import { A } from "@solidjs/router";
 
 const Audios = () => {
   const accessToken = useAuthenticated();
@@ -26,15 +28,8 @@ const Audios = () => {
   });
 
   return (
-    <Container sx={{ mt: 15, mb: 15 }}>
-      <Show
-        when={!loading()}
-        fallback={
-          <Box sx={{ display: "flex", justifyContent: "center" }}>
-            <CircularProgress />
-          </Box>
-        }
-      >
+    <Show when={!loading()} fallback={<PageProgress />}>
+      <Container sx={{ mt: 15, mb: 15 }}>
         <Show when={error()}>
           <Alert severity="error">{error()}</Alert>
         </Show>
@@ -50,30 +45,32 @@ const Audios = () => {
             )}
           </For>
         </Grid>
-      </Show>
-    </Container>
+      </Container>
+    </Show>
   );
 };
 
 const Audio: Component<{ audio: ApiAudio }> = ({ audio }) => {
   const transcribed = audio.transcription && audio.transcription.length > 0;
   return (
-    <Card
-      sx={{
-        width: 250,
-        height: 250,
-        backgroundColor: transcribed ? "#fff" : "#e0e0e0",
-      }}
-    >
-      <CardContent>
-        <Show
-          when={transcribed}
-          fallback={<Typography fontStyle="italic">Processing</Typography>}
-        >
-          {cutText(audio.transcription, 310)}
-        </Show>
-      </CardContent>
-    </Card>
+    <Link component={A} href={`/${audio.id}`} sx={{ textDecoration: "none" }}>
+      <Card
+        sx={{
+          width: 250,
+          height: 250,
+          backgroundColor: transcribed ? "#fff" : "#e0e0e0",
+        }}
+      >
+        <CardContent>
+          <Show
+            when={transcribed}
+            fallback={<Typography fontStyle="italic">Processing</Typography>}
+          >
+            {cutText(audio.transcription, 310)}
+          </Show>
+        </CardContent>
+      </Card>
+    </Link>
   );
 };
 

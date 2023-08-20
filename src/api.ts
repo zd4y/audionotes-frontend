@@ -2,7 +2,9 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export interface Audio {
   id: number;
+  length: number;
   transcription: string;
+  created_at: string;
 }
 
 export interface User {
@@ -63,6 +65,36 @@ export async function getAudios(
     return { audios, error: parseError(res.status) };
   } else {
     return { audios: [], error };
+  }
+}
+
+export async function getAudio(
+  accessToken: string,
+  audioId: number,
+): Promise<{ error: string; audio: Audio | null }> {
+  const { res, error } = await request(`/audios/${audioId}`, "GET", {
+    Authorization: `Bearer ${accessToken}`,
+  });
+  if (res) {
+    const audio = await res.json();
+    return { error: parseError(res.status), audio };
+  } else {
+    return { error, audio: null };
+  }
+}
+
+export async function getAudioFile(
+  accessToken: string,
+  audioId: number,
+): Promise<{ error: string; blob: Blob | null }> {
+  const { res, error } = await request(`/audios/${audioId}/file`, "GET", {
+    Authorization: `Bearer ${accessToken}`,
+  });
+  if (res) {
+    const blob = await res.blob();
+    return { error: parseError(res.status), blob };
+  } else {
+    return { error, blob: null };
   }
 }
 

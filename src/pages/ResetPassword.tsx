@@ -125,7 +125,7 @@ const ResetPassword = () => {
             <Show when={successMsg()}>
               <Alert severity="success">{successMsg()}</Alert>
             </Show>
-            <Stack flexDirection="row" alignItems="center" spacing={1}>
+            <Stack direction="row" alignItems="center" spacing={1}>
               <Button variant="contained" type="submit">
                 Reset password
               </Button>

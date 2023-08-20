@@ -16,11 +16,14 @@ interface AuthorizeData {
   password: string;
 }
 
-export async function pingApi(): Promise<void> {
+export async function pingApi(retries?: number): Promise<void> {
+  if (retries === 3) {
+    return
+  }
   const { res, error } = await request("/");
   if (!res || res.status === 503 || error) {
     await sleep(1000);
-    return await pingApi();
+    return await pingApi((retries || 0) + 1);
   }
 }
 

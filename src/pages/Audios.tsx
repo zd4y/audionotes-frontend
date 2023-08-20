@@ -3,6 +3,7 @@ import { useAuthenticated } from "../auth";
 import { getAudios, Audio as ApiAudio } from "../api";
 import {
   Alert,
+  Box,
   Card,
   CardContent,
   CircularProgress,
@@ -25,8 +26,15 @@ const Audios = () => {
   });
 
   return (
-    <Container sx={{ mt: 15 }}>
-      <Show when={!loading()} fallback={<CircularProgress />}>
+    <Container sx={{ mt: 15, mb: 15 }}>
+      <Show
+        when={!loading()}
+        fallback={
+          <Box sx={{ display: "flex", justifyContent: "center" }}>
+            <CircularProgress />
+          </Box>
+        }
+      >
         <Show when={error()}>
           <Alert severity="error">{error()}</Alert>
         </Show>

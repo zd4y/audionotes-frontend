@@ -31,7 +31,11 @@ const App: Component = () => {
   return (
     <Show
       when={serverAvailable()}
-      fallback={<Container sx={{ mt: 15 }}><Alert severity="error">Server unavailable</Alert></Container>}
+      fallback={
+        <Container sx={{ mt: 15 }}>
+          <Alert severity="error">Server unavailable</Alert>
+        </Container>
+      }
     >
       <Switch
         fallback={

@@ -91,7 +91,12 @@ const Audios = () => {
         onClick={onRecordingBtnClick}
         color={recordingAudio() ? "error" : "primary"}
         aria-label="record"
-        sx={{ position: "absolute", right: 50, bottom: 50, zIndex: 10000 }}
+        sx={{
+          position: "fixed",
+          right: { xs: 25, lg: 50 },
+          bottom: { xs: 25, lg: 50 },
+          zIndex: 10000,
+        }}
       >
         {recordingAudio() ? <Stop /> : <Mic />}
       </Fab>

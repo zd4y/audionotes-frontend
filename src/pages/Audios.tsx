@@ -2,10 +2,8 @@ import {
   Component,
   For,
   Show,
-  createComputed,
   createEffect,
   createSignal,
-  on,
   onCleanup,
   onMount,
 } from "solid-js";
@@ -16,7 +14,6 @@ import {
   Button,
   Card,
   CardContent,
-  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -227,7 +224,7 @@ const RecordAudio: Component<{
     waveSurfer = WaveSurfer.create({
       container,
       waveColor: theme.palette.primary.main,
-      height: 100,
+      height: 500,
       barWidth: 4,
       barGap: 4,
       barRadius: 2,

@@ -32,3 +32,7 @@ Your app is ready to be deployed!
 ## Deployment
 
 You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
+
+---
+
+Icon by [Creatype - Flaticon](https://www.flaticon.com/free-icon/mic_9172330)

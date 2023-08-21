@@ -20,7 +20,7 @@ export async function pingApi(retries: number): Promise<boolean> {
   if (retries === 0) {
     return false;
   }
-  const { res } = await request("");
+  const { res } = await request("/ping");
   if (!res?.ok) {
     await sleep(1000);
     return await pingApi(retries - 1);

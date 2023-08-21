@@ -65,7 +65,6 @@ const Audios = () => {
 
   const calculateAudioCardSize = () => {
     const windowSize = document.getElementById("root")!.clientWidth;
-    console.log(windowSize);
 
     let initialSize = 150;
     let containerMargin = 0;

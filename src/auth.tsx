@@ -32,7 +32,7 @@ export const AuthProvider: ParentComponent = (props) => {
   const [error, setError] = createSignal<string>("");
 
   onMount(async () => {
-    const savedToken = sessionStorage.getItem("access_token");
+    const savedToken = localStorage.getItem("access_token");
     if (savedToken !== null && savedToken.length > 0) {
       const { error } = await getUser(savedToken);
       if (error.length == 0) {
@@ -41,7 +41,7 @@ export const AuthProvider: ParentComponent = (props) => {
       } else {
         setAccessToken("");
         setError(error);
-        sessionStorage.removeItem("access_token");
+        localStorage.removeItem("access_token");
       }
       setLoading(false);
     } else {
@@ -56,11 +56,11 @@ export const AuthProvider: ParentComponent = (props) => {
     loading,
     error,
     login(token: string) {
-      sessionStorage.setItem("access_token", token);
+      localStorage.setItem("access_token", token);
       setAccessToken(token);
     },
     logout() {
-      sessionStorage.removeItem("access_token");
+      localStorage.removeItem("access_token");
       setAccessToken("");
     },
   };

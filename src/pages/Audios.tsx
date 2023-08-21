@@ -228,7 +228,6 @@ const RecordAudio: Component<{
       container,
       waveColor: theme.palette.primary.main,
       height: 100,
-      normalize: true,
       barWidth: 4,
       barGap: 4,
       barRadius: 2,

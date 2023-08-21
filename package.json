@@ -6,14 +6,17 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "generate-pwa-assets": "pwa-assets-generator"
   },
   "license": "MIT",
   "devDependencies": {
+    "@vite-pwa/assets-generator": "^0.0.8",
     "prettier": "3.0.2",
     "solid-devtools": "^0.27.3",
     "typescript": "^5.1.6",
     "vite": "^4.4.9",
+    "vite-plugin-pwa": "^0.16.4",
     "vite-plugin-solid": "^2.7.0"
   },
   "dependencies": {

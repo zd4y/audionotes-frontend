@@ -14,6 +14,7 @@ import {
   Button,
   Card,
   CardContent,
+  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -41,6 +42,7 @@ const Audios = () => {
   const [recordingAudioOpen, setRecordingAudioOpen] = createSignal(false);
   const [audioCardSize, setAudioCardSize] = createSignal(0);
   const [containerMargin, setContainerMargin] = createSignal(0);
+  const [successMsg, setSuccessMsg] = createSignal("");
   let timeoutId = 0;
 
   onMount(async () => {
@@ -106,25 +108,31 @@ const Audios = () => {
   };
 
   const onSaveRecording = async (blob: Blob) => {
+    setRecordingAudio(false);
+    setRecordingAudioOpen(false);
     const { error } = await newAudio(accessToken(), blob);
     if (error) {
       setError(error);
     } else {
       await callGetAudios();
+      setSuccessMsg("Recording saved successfully");
     }
-    setRecordingAudio(false);
-    setRecordingAudioOpen(false);
   };
 
   return (
     <>
       <Show when={!loading() && audioCardSize()} fallback={<PageProgress />}>
-        <Show when={error()}>
-          <Alert severity="error">{error()}</Alert>
-        </Show>
+        <Container sx={{ mb: 2, mt: { xs: 5, lg: 15 } }}>
+          <Show when={error()}>
+            <Alert severity="error">{error()}</Alert>
+          </Show>
+          <Show when={successMsg()}>
+            <Alert severity="success">{successMsg()}</Alert>
+          </Show>
+        </Container>
         <Grid
           container
-          sx={{ mt: { xs: 5, lg: 15 }, mb: { xs: 5, lg: 15 } }}
+          sx={{ mb: { xs: 5, lg: 15 } }}
           paddingLeft={`${containerMargin() + SPACE_BETWEEN_CARDS}px`}
           paddingRight={`${containerMargin()}px`}
         >

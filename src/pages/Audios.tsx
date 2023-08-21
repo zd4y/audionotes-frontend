@@ -4,13 +4,13 @@ import {
   Show,
   createEffect,
   createSignal,
+  onCleanup,
   onMount,
 } from "solid-js";
 import { useAuthenticated } from "../auth";
 import { getAudios, Audio as ApiAudio, newAudio } from "../api";
 import {
   Alert,
-  Box,
   Button,
   Card,
   CardContent,
@@ -31,6 +31,8 @@ import { Mic, Stop } from "@suid/icons-material";
 import WaveSurfer from "wavesurfer.js";
 import RecordPlugin from "wavesurfer.js/plugins/record";
 
+const SPACE_BETWEEN_CARDS = 16;
+
 const Audios = () => {
   const accessToken = useAuthenticated();
   const [audios, setAudios] = createSignal<ApiAudio[]>([]);
@@ -38,10 +40,49 @@ const Audios = () => {
   const [loading, setLoading] = createSignal(true);
   const [recordingAudio, setRecordingAudio] = createSignal(false);
   const [recordingAudioOpen, setRecordingAudioOpen] = createSignal(false);
+  const [audioCardSize, setAudioCardSize] = createSignal(0);
+  const [containerMargin, setContainerMargin] = createSignal(0);
 
   onMount(async () => {
     await callGetAudios();
+    window.addEventListener("resize", handleWindowResize);
+    calculateAudioCardSize(window.innerWidth);
   });
+
+  onCleanup(() => {
+    window.removeEventListener("resize", handleWindowResize);
+  });
+
+  const handleWindowResize = (e: Event) => {
+    const window = e.target as Window;
+    calculateAudioCardSize(window.innerWidth);
+  };
+
+  const calculateAudioCardSize = (windowSize: number) => {
+    let initialSize = 150;
+    let containerMargin = 0;
+    if (windowSize >= 900) {
+      initialSize = 150;
+      containerMargin = 0.1 * windowSize;
+    } else if (windowSize >= 450) {
+      initialSize = 130;
+    } else if (windowSize > 360) {
+      initialSize = 150;
+    } else if (windowSize >= 150) {
+      initialSize = 100;
+    }
+
+    const totalSize = windowSize - containerMargin * 2;
+
+    const initialSpace = initialSize + SPACE_BETWEEN_CARDS;
+    const numOfCards = Math.floor(
+      (totalSize - SPACE_BETWEEN_CARDS) / initialSpace,
+    );
+    const remainingSpace = totalSize - SPACE_BETWEEN_CARDS * (numOfCards + 1);
+
+    setContainerMargin(containerMargin);
+    setAudioCardSize(Math.floor(remainingSpace / numOfCards));
+  };
 
   const callGetAudios = async () => {
     let { audios, error } = await getAudios(accessToken());
@@ -73,28 +114,31 @@ const Audios = () => {
 
   return (
     <>
-      <Show when={!loading()} fallback={<PageProgress />}>
-        <Container sx={{ mt: 15, mb: 15 }}>
-          <Show when={error()}>
-            <Alert severity="error">{error()}</Alert>
-          </Show>
-          <Grid container spacing={2}>
-            <For
-              each={audios()}
-              fallback={
-                <Grid item>
-                  <Typography>No audios found.</Typography>
-                </Grid>
-              }
-            >
-              {(audio) => (
-                <Grid item>
-                  <Audio audio={audio} />
-                </Grid>
-              )}
-            </For>
-          </Grid>
-        </Container>
+      <Show when={!loading() && audioCardSize()} fallback={<PageProgress />}>
+        <Show when={error()}>
+          <Alert severity="error">{error()}</Alert>
+        </Show>
+        <Grid
+          container
+          sx={{ mt: { xs: 5, lg: 15 }, mb: { xs: 5, lg: 15 } }}
+          paddingLeft={`${containerMargin() + SPACE_BETWEEN_CARDS}px`}
+          paddingRight={`${containerMargin()}px`}
+        >
+          <For
+            each={audios()}
+            fallback={
+              <Grid item>
+                <Typography>No audios found.</Typography>
+              </Grid>
+            }
+          >
+            {(audio) => (
+              <Grid item>
+                <Audio audio={audio} size={audioCardSize()} />
+              </Grid>
+            )}
+          </For>
+        </Grid>
       </Show>
       <Fab
         onClick={onRecordingBtnClick}
@@ -119,7 +163,7 @@ const Audios = () => {
   );
 };
 
-const Audio: Component<{ audio: ApiAudio }> = (props) => {
+const Audio: Component<{ audio: ApiAudio; size: number }> = (props) => {
   return (
     <Link
       component={A}
@@ -128,8 +172,10 @@ const Audio: Component<{ audio: ApiAudio }> = (props) => {
     >
       <Card
         sx={{
-          width: { xs: 150, md: 250 },
-          height: { xs: 150, md: 250 },
+          width: props.size,
+          height: props.size,
+          marginRight: `${SPACE_BETWEEN_CARDS}px`,
+          marginBottom: `${SPACE_BETWEEN_CARDS}px`,
           backgroundColor: props.audio.transcription ? "#fff" : "#e0e0e0",
         }}
       >

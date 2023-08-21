@@ -2,8 +2,10 @@ import {
   Component,
   For,
   Show,
+  createComputed,
   createEffect,
   createSignal,
+  on,
   onCleanup,
   onMount,
 } from "solid-js";
@@ -42,23 +44,29 @@ const Audios = () => {
   const [recordingAudioOpen, setRecordingAudioOpen] = createSignal(false);
   const [audioCardSize, setAudioCardSize] = createSignal(0);
   const [containerMargin, setContainerMargin] = createSignal(0);
+  let timeoutId = 0;
 
   onMount(async () => {
     await callGetAudios();
     window.addEventListener("resize", handleWindowResize);
-    calculateAudioCardSize(window.innerWidth);
+    calculateAudioCardSize();
   });
 
   onCleanup(() => {
     window.removeEventListener("resize", handleWindowResize);
+    setAudioCardSize(0);
+    clearTimeout(timeoutId);
   });
 
-  const handleWindowResize = (e: Event) => {
-    const window = e.target as Window;
-    calculateAudioCardSize(window.innerWidth);
+  const handleWindowResize = () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => calculateAudioCardSize(), 1000);
   };
 
-  const calculateAudioCardSize = (windowSize: number) => {
+  const calculateAudioCardSize = () => {
+    const windowSize = document.getElementById("root")!.clientWidth;
+    console.log(windowSize);
+
     let initialSize = 150;
     let containerMargin = 0;
     if (windowSize >= 900) {
@@ -80,7 +88,7 @@ const Audios = () => {
     );
     const remainingSpace = totalSize - SPACE_BETWEEN_CARDS * (numOfCards + 1);
 
-    setContainerMargin(containerMargin);
+    setContainerMargin(Math.floor(containerMargin));
     setAudioCardSize(Math.floor(remainingSpace / numOfCards));
   };
 

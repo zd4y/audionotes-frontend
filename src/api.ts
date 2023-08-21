@@ -189,6 +189,8 @@ function parseError(statusCode: number) {
     return "Internal server error";
   } else if (statusCode >= 200 && statusCode < 300) {
     return "";
+  } else if (statusCode === 401) {
+    return "Unauthorized";
   } else {
     return `Error ${statusCode}`;
   }

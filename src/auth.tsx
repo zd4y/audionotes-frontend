@@ -41,7 +41,9 @@ export const AuthProvider: ParentComponent = (props) => {
       } else {
         setAccessToken("");
         setError(error);
-        localStorage.removeItem("access_token");
+        if (error === "Unauthorized") {
+          localStorage.removeItem("access_token");
+        }
       }
       setLoading(false);
     } else {

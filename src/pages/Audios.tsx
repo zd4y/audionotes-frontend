@@ -224,7 +224,7 @@ const RecordAudio: Component<{
     waveSurfer = WaveSurfer.create({
       container,
       waveColor: theme.palette.primary.main,
-      height: 500,
+      height: 250,
       barWidth: 4,
       barGap: 4,
       barRadius: 2,

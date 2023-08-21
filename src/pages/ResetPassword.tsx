@@ -105,7 +105,7 @@ const ResetPassword = () => {
             <Show when={warning()}>
               <Alert severity="warning">{warning()}</Alert>
             </Show>
-            <Show when={suggestions()}>
+            <Show when={suggestions().length > 0}>
               <Alert severity="info">
                 <AlertTitle>Suggestions</AlertTitle>
                 <For each={suggestions()}>

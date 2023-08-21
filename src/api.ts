@@ -20,8 +20,8 @@ export async function pingApi(retries: number): Promise<boolean> {
   if (retries === 0) {
     return false;
   }
-  const { res, error } = await request("/");
-  if (!res || res.status === 503 || error) {
+  const { res } = await request("/");
+  if (!res?.ok) {
     await sleep(1000);
     return await pingApi(retries - 1);
   }
@@ -36,7 +36,7 @@ export async function authorize(
   if (res) {
     const res_data = await res.json();
     return {
-      error: parseAuthorizeError(res.status),
+      error: res.status === 401 ? "Wrong email or password" : error,
       accessToken: res_data.access_token || null,
     };
   } else {
@@ -50,12 +50,11 @@ export async function getUser(
   const { res, error } = await request("/user", "GET", {
     Authorization: `Bearer ${accessToken}`,
   });
-  if (res) {
-    const user = await res.json();
-    return { error: parseError(res.status), user: user || null };
-  } else {
-    return { error, user: null };
+  let user = null;
+  if (res?.ok) {
+    user = await res.json();
   }
+  return { error, user };
 }
 
 export async function getAudios(
@@ -64,12 +63,11 @@ export async function getAudios(
   const { res, error } = await request("/audios", "GET", {
     Authorization: `Bearer ${accessToken}`,
   });
-  if (res) {
-    const audios = await res.json();
-    return { audios, error: parseError(res.status) };
-  } else {
-    return { audios: [], error };
+  let audios = []
+  if (res?.ok) {
+    audios = await res.json();
   }
+  return { audios, error };
 }
 
 export async function getAudio(
@@ -79,12 +77,11 @@ export async function getAudio(
   const { res, error } = await request(`/audios/${audioId}`, "GET", {
     Authorization: `Bearer ${accessToken}`,
   });
-  if (res) {
-    const audio = await res.json();
-    return { error: parseError(res.status), audio };
-  } else {
-    return { error, audio: null };
+  let audio = null;
+  if (res?.ok) {
+    audio = await res.json();
   }
+  return { error, audio };
 }
 
 export async function getAudioFile(
@@ -94,19 +91,18 @@ export async function getAudioFile(
   const { res, error } = await request(`/audios/${audioId}/file`, "GET", {
     Authorization: `Bearer ${accessToken}`,
   });
-  if (res) {
-    const blob = await res.blob();
-    return { error: parseError(res.status), blob };
-  } else {
-    return { error, blob: null };
+  let blob = null;
+  if (res?.ok) {
+    blob = await res.blob();
   }
+  return { error, blob };
 }
 
 export async function newAudio(
   accessToken: string,
   blob: Blob,
 ): Promise<{ error: string }> {
-  const { res, error } = await request(
+  const { error } = await request(
     `/audios`,
     "POST",
     {
@@ -114,9 +110,6 @@ export async function newAudio(
     },
     blob,
   );
-  if (res) {
-    return { error: parseError(res.status) };
-  }
   return { error };
 }
 
@@ -153,15 +146,9 @@ export async function resetPassword(data: ResetPasswordData): Promise<{
         suggestions: [],
       };
     }
-    return {
-      reset: false,
-      error: parseError(res.status),
-      suggestions: [],
-      warning: "",
-    };
-  } else {
-    return { reset: false, error, suggestions: [], warning: "" };
   }
+
+  return { reset: false, error, suggestions: [], warning: "" };
 }
 
 export async function requestResetPassword(
@@ -174,35 +161,10 @@ export async function requestResetPassword(
     {},
     body,
   );
-  if (res) {
-    if (res.status === 202) {
-      return { error: "", sent: true };
-    }
-    return { error: parseError(res.status), sent: false };
+  if (res?.status === 202) {
+    return { error: "", sent: true };
   } else {
     return { error, sent: false };
-  }
-}
-
-function parseError(statusCode: number) {
-  if (statusCode >= 500) {
-    return "Internal server error";
-  } else if (statusCode >= 200 && statusCode < 300) {
-    return "";
-  } else if (statusCode === 401) {
-    return "Unauthorized";
-  } else {
-    return `Error ${statusCode}`;
-  }
-}
-
-function parseAuthorizeError(statusCode: number) {
-  if (statusCode >= 500) {
-    return "Internal server error";
-  } else if (statusCode >= 200 && statusCode < 300) {
-    return "";
-  } else {
-    return "Wrong email or password";
   }
 }
 
@@ -223,10 +185,22 @@ async function request(
       body,
       headers: headers2,
     });
-    return { res };
+    return { res, error: getError(res) };
   } catch (err) {
     console.error(err);
-    return { error: "Internal error" };
+    return { res: null, error: "Internal error" };
+  }
+}
+
+function getError(response: Response) {
+  if (response.ok) {
+    return ""
+  } else if (response.status >= 500) {
+    return "Internal server error";
+  } else if (response.status === 401) {
+    return "Unauthorized";
+  } else {
+    return `Error ${response.status}`;
   }
 }
 

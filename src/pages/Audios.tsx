@@ -217,7 +217,6 @@ const RecordAudio: Component<{
   onSave: (audioBlob: Blob) => void;
 }> = (props) => {
   const [blob, setBlob] = createSignal<Blob | null>(null);
-  const [audioBlobUrl, setAudioBlobUrl] = createSignal("");
   const theme = useTheme();
 
   let container: HTMLDivElement | undefined;
@@ -233,7 +232,6 @@ const RecordAudio: Component<{
     if (!container) return;
 
     setBlob(null);
-    setAudioBlobUrl("");
 
     waveSurfer = WaveSurfer.create({
       container,
@@ -245,8 +243,6 @@ const RecordAudio: Component<{
     });
     record = waveSurfer.registerPlugin(RecordPlugin.create());
     record.on("record-end", (blob: Blob) => {
-      const recordedUrl = URL.createObjectURL(blob);
-      setAudioBlobUrl(recordedUrl);
       setBlob(blob);
     });
     record.startRecording();
@@ -274,9 +270,6 @@ const RecordAudio: Component<{
       <DialogTitle>Recording audio</DialogTitle>
       <DialogContent>
         <div ref={container} />
-        <Show when={audioBlobUrl()}>
-          <audio controls src={audioBlobUrl()} />
-        </Show>
       </DialogContent>
     </Dialog>
   );

@@ -1,4 +1,5 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const CACHE_NAME = "audionotes";
 
 export interface Audio {
   id: number;
@@ -109,6 +110,8 @@ export async function newAudio(
       Authorization: `Bearer ${accessToken}`,
     },
     blob,
+    true,
+    false,
   );
   return { error };
 }
@@ -126,7 +129,14 @@ export async function resetPassword(data: ResetPasswordData): Promise<{
   warning: string;
 }> {
   const body = JSON.stringify(data);
-  const { res, error } = await request("/user/reset-password", "PUT", {}, body);
+  const { res, error } = await request(
+    "/user/reset-password",
+    "PUT",
+    {},
+    body,
+    true,
+    false,
+  );
   if (res) {
     if (res.status === 204) {
       return { reset: true, error: "", suggestions: [], warning: "" };
@@ -160,6 +170,8 @@ export async function requestResetPassword(
     "PUT",
     {},
     body,
+    true,
+    false,
   );
   if (res?.status === 202) {
     return { error: "", sent: true };
@@ -174,19 +186,37 @@ async function request(
   headers?: { [key: string]: string },
   body?: BodyInit,
   isJson?: boolean,
+  allowCache?: boolean,
 ) {
   const headers2 = headers || {};
   if (isJson !== false) {
     headers2["Content-Type"] = "application/json";
   }
+
+  const url = `${BASE_URL}/api${path}`;
+
+  const cacheStorage = await caches.open(CACHE_NAME);
+
   try {
-    const res = await fetch(`${BASE_URL}/api${path}`, {
+    const res = await fetch(url, {
       method,
       body,
       headers: headers2,
     });
+    if (allowCache !== false) {
+      await cacheStorage.put(url, res.clone());
+    }
     return { res, error: getError(res) };
   } catch (err) {
+    let cachedResponse = undefined;
+    if (allowCache !== false) {
+      cachedResponse = await cacheStorage.match(url);
+    }
+
+    if (cachedResponse !== undefined) {
+      return { res: cachedResponse, error: getError(cachedResponse) };
+    }
+
     console.error(err);
     return { res: null, error: "Internal error" };
   }

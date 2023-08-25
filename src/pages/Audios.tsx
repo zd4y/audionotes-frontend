@@ -38,6 +38,7 @@ const Audios = () => {
   const [audios, setAudios] = createSignal<ApiAudio[]>([]);
   const [error, setError] = createSignal("");
   const [loading, setLoading] = createSignal(true);
+  const [uploading, setUploading] = createSignal(false);
   const [recordingAudio, setRecordingAudio] = createSignal(false);
   const [recordingAudioOpen, setRecordingAudioOpen] = createSignal(false);
   const [audioCardSize, setAudioCardSize] = createSignal(0);
@@ -98,6 +99,7 @@ const Audios = () => {
   };
 
   const onRecordingBtnClick = () => {
+    setSuccessMsg("");
     setRecordingAudio((recording) => !recording);
     setRecordingAudioOpen(true);
   };
@@ -108,9 +110,12 @@ const Audios = () => {
   };
 
   const onSaveRecording = async (blob: Blob) => {
+    setSuccessMsg("");
+    setUploading(true);
     setRecordingAudio(false);
     setRecordingAudioOpen(false);
     const { error } = await newAudio(accessToken(), blob);
+    setUploading(false);
     if (error) {
       setError(error);
     } else {
@@ -128,6 +133,9 @@ const Audios = () => {
           </Show>
           <Show when={successMsg()}>
             <Alert severity="success">{successMsg()}</Alert>
+          </Show>
+          <Show when={uploading()}>
+            <Alert severity="info">Uploading audio...</Alert>
           </Show>
         </Container>
         <Grid
@@ -251,15 +259,18 @@ const RecordAudio: Component<{
     props.onClose();
   };
 
-  const handleSave = () => {
-    props.onSave(blob()!);
-  };
-
   const stopRecording = () => {
     waveSurfer?.destroy();
     waveSurfer = null;
     record = null;
   };
+
+  createEffect(() => {
+    const b = blob();
+    if (b) {
+      props.onSave(b);
+    }
+  });
 
   return (
     <Dialog open={props.open} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -270,11 +281,6 @@ const RecordAudio: Component<{
           <audio controls src={audioBlobUrl()} />
         </Show>
       </DialogContent>
-      <DialogActions>
-        <Show when={audioBlobUrl()}>
-          <Button onClick={handleSave}>Save</Button>
-        </Show>
-      </DialogActions>
     </Dialog>
   );
 };

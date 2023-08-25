@@ -45,6 +45,21 @@ export default defineConfig({
           },
         ],
       },
+      workbox: {
+        runtimeCaching: [{
+          handler: "NetworkOnly",
+          urlPattern: /api\/audios/,
+          method: "POST",
+          options: {
+            backgroundSync: {
+              name: "uploadNote",
+              options: {
+                maxRetentionTime: 60 * 60 * 24
+              }
+            }
+          }
+        }]
+      }
     }),
   ],
   server: {

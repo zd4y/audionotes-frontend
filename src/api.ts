@@ -64,11 +64,13 @@ export async function getUser(
 }
 
 export async function getAudios(
+  getCached: boolean,
   accessToken: string,
 ): Promise<{ audios: Audio[]; error: string }> {
   const { res, error } = await request("/audios", {
     accessToken,
     allowCache: true,
+    getCached,
   });
   let audios = [];
   if (res?.ok) {
@@ -186,12 +188,14 @@ const request = async (
     body,
     isJson = true,
     allowCache,
+    getCached = false,
   }: {
     method?: string;
     accessToken?: string;
     body?: BodyInit;
     isJson?: boolean;
     allowCache: boolean;
+    getCached?: boolean;
   },
 ) => {
   const headers: HeadersInit = {};
@@ -204,6 +208,12 @@ const request = async (
 
   const cacheStorage = await caches.open(CACHE_NAME);
   const url = `${BASE_URL}/api${path}`;
+
+  if (getCached) {
+    const res = (await cacheStorage.match(url)) || null;
+    const error = res ? getError(res) : "";
+    return { res, error };
+  }
 
   try {
     const res = await fetch(url, {

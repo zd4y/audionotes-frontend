@@ -90,10 +90,17 @@ const Audios = () => {
   };
 
   const callGetAudios = async () => {
-    let { audios, error } = await getAudios(accessToken());
+    let { audios, error } = await getAudios(true, accessToken());
     setAudios(audios);
     setError(error);
     setLoading(false);
+
+    let { audios: audios2, error: error2 } = await getAudios(
+      false,
+      accessToken(),
+    );
+    setAudios(audios2);
+    setError(error2);
   };
 
   const onRecordingBtnClick = () => {

@@ -114,8 +114,8 @@ const Audios = () => {
     if (error) {
       setError(error);
     } else {
-      await callGetAudios();
       setSuccessMsg("Recording saved successfully");
+      await callGetAudios();
     }
   };
 

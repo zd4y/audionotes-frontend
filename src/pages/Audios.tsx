@@ -104,11 +104,6 @@ const Audios = () => {
     setRecordingAudioOpen(true);
   };
 
-  const onRecordingClose = () => {
-    setRecordingAudio(false);
-    setRecordingAudioOpen(false);
-  };
-
   const onSaveRecording = async (blob: Blob) => {
     setSuccessMsg("");
     setUploading(true);
@@ -176,7 +171,6 @@ const Audios = () => {
       <RecordAudio
         open={recordingAudioOpen()}
         recording={recordingAudio()}
-        onClose={onRecordingClose}
         onSave={onSaveRecording}
       />
     </>
@@ -215,7 +209,6 @@ const Audio: Component<{ audio: ApiAudio; size: number }> = (props) => {
 const RecordAudio: Component<{
   open: boolean;
   recording: boolean;
-  onClose: () => void;
   onSave: (audioBlob: Blob) => void;
 }> = (props) => {
   const [blob, setBlob] = createSignal<Blob | null>(null);
@@ -256,7 +249,6 @@ const RecordAudio: Component<{
 
   const handleClose = () => {
     stopRecording();
-    props.onClose();
   };
 
   const stopRecording = () => {

@@ -45,6 +45,11 @@ const Audios = () => {
   let timeoutId = 0;
 
   onMount(async () => {
+    let { audios, error } = await getAudios(true, accessToken());
+    setAudios(audios);
+    setError(error);
+    setLoading(false);
+
     await callGetAudios();
     window.addEventListener("resize", handleWindowResize);
     calculateAudioCardSize();
@@ -90,11 +95,6 @@ const Audios = () => {
   };
 
   const callGetAudios = async () => {
-    let { audios, error } = await getAudios(true, accessToken());
-    setAudios(audios);
-    setError(error);
-    setLoading(false);
-
     let { audios: audios2, error: error2 } = await getAudios(
       false,
       accessToken(),

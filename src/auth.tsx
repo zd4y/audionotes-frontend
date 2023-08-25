@@ -33,19 +33,19 @@ export const AuthProvider: ParentComponent = (props) => {
 
   onMount(async () => {
     const savedToken = localStorage.getItem("access_token");
-    if (savedToken !== null && savedToken.length > 0) {
+    if (savedToken) {
+      setAccessToken(savedToken);
+      setError("");
+      setLoading(false);
+
       const { error } = await getUser(savedToken);
-      if (error.length == 0) {
-        setAccessToken(savedToken);
-        setError("");
-      } else {
+      if (error) {
         setAccessToken("");
         setError(error);
         if (error === "Unauthorized") {
           localStorage.removeItem("access_token");
         }
       }
-      setLoading(false);
     } else {
       setAccessToken("");
       setError("");

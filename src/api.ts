@@ -63,7 +63,7 @@ export async function getAudios(
   const { res, error } = await request("/audios", "GET", {
     Authorization: `Bearer ${accessToken}`,
   });
-  let audios = []
+  let audios = [];
   if (res?.ok) {
     audios = await res.json();
   }
@@ -194,7 +194,7 @@ async function request(
 
 function getError(response: Response) {
   if (response.ok) {
-    return ""
+    return "";
   } else if (response.status >= 500) {
     return "Internal server error";
   } else if (response.status === 401) {

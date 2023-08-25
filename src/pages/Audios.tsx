@@ -198,7 +198,7 @@ const Audio: Component<{ audio: ApiAudio; size: number }> = (props) => {
             when={props.audio.transcription}
             fallback={<Typography fontStyle="italic">Processing</Typography>}
           >
-            {cutText(props.audio.transcription, 310)}
+            {props.audio.transcription}
           </Show>
         </CardContent>
       </Card>
@@ -275,14 +275,6 @@ const RecordAudio: Component<{
       </DialogContent>
     </Dialog>
   );
-};
-
-const cutText = (text: string, toLen: number) => {
-  if (text.length <= toLen) {
-    return text;
-  }
-  let newText = text.slice(0, toLen - 3);
-  return newText + "...";
 };
 
 export default Audios;

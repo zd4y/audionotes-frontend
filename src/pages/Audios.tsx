@@ -49,10 +49,10 @@ const Audios = () => {
     setAudios(audios);
     setError(error);
     setLoading(false);
+    calculateAudioCardSize();
 
     await callGetAudios();
     window.addEventListener("resize", handleWindowResize);
-    calculateAudioCardSize();
   });
 
   onCleanup(() => {

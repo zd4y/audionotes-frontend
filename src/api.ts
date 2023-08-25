@@ -21,7 +21,7 @@ export async function pingApi(retries: number): Promise<boolean> {
   if (retries === 0) {
     return false;
   }
-  const { res } = await request("/ping");
+  const { res } = await request("/ping", { allowCache: true });
   if (!res?.ok) {
     await sleep(1000);
     return await pingApi(retries - 1);
@@ -33,7 +33,11 @@ export async function authorize(
   data: AuthorizeData,
 ): Promise<{ error: string; accessToken: string | null }> {
   const body = JSON.stringify(data);
-  const { res, error } = await request("/user/authorize", "POST", {}, body);
+  const { res, error } = await request("/user/authorize", {
+    method: "POST",
+    body,
+    allowCache: true,
+  });
   if (res) {
     const res_data = await res.json();
     return {
@@ -48,8 +52,9 @@ export async function authorize(
 export async function getUser(
   accessToken: string,
 ): Promise<{ error: string; user: User | null }> {
-  const { res, error } = await request("/user", "GET", {
-    Authorization: `Bearer ${accessToken}`,
+  const { res, error } = await request("/user", {
+    allowCache: true,
+    accessToken,
   });
   let user = null;
   if (res?.ok) {
@@ -61,8 +66,9 @@ export async function getUser(
 export async function getAudios(
   accessToken: string,
 ): Promise<{ audios: Audio[]; error: string }> {
-  const { res, error } = await request("/audios", "GET", {
-    Authorization: `Bearer ${accessToken}`,
+  const { res, error } = await request("/audios", {
+    accessToken,
+    allowCache: true,
   });
   let audios = [];
   if (res?.ok) {
@@ -75,8 +81,9 @@ export async function getAudio(
   accessToken: string,
   audioId: number,
 ): Promise<{ error: string; audio: Audio | null }> {
-  const { res, error } = await request(`/audios/${audioId}`, "GET", {
-    Authorization: `Bearer ${accessToken}`,
+  const { res, error } = await request(`/audios/${audioId}`, {
+    accessToken,
+    allowCache: true,
   });
   let audio = null;
   if (res?.ok) {
@@ -89,8 +96,9 @@ export async function getAudioFile(
   accessToken: string,
   audioId: number,
 ): Promise<{ error: string; blob: Blob | null }> {
-  const { res, error } = await request(`/audios/${audioId}/file`, "GET", {
-    Authorization: `Bearer ${accessToken}`,
+  const { res, error } = await request(`/audios/${audioId}/file`, {
+    accessToken,
+    allowCache: true,
   });
   let blob = null;
   if (res?.ok) {
@@ -103,16 +111,12 @@ export async function newAudio(
   accessToken: string,
   blob: Blob,
 ): Promise<{ error: string }> {
-  const { error } = await request(
-    `/audios`,
-    "POST",
-    {
-      Authorization: `Bearer ${accessToken}`,
-    },
-    blob,
-    true,
-    false,
-  );
+  const { error } = await request(`/audios`, {
+    method: "POST",
+    accessToken,
+    allowCache: false,
+    body: blob,
+  });
   return { error };
 }
 
@@ -129,14 +133,11 @@ export async function resetPassword(data: ResetPasswordData): Promise<{
   warning: string;
 }> {
   const body = JSON.stringify(data);
-  const { res, error } = await request(
-    "/user/reset-password",
-    "PUT",
-    {},
+  const { res, error } = await request("/user/reset-password", {
+    method: "PUT",
     body,
-    true,
-    false,
-  );
+    allowCache: false,
+  });
   if (res) {
     if (res.status === 204) {
       return { reset: true, error: "", suggestions: [], warning: "" };
@@ -165,14 +166,11 @@ export async function requestResetPassword(
   email: string,
 ): Promise<{ sent: boolean; error: string }> {
   const body = JSON.stringify({ email });
-  const { res, error } = await request(
-    "/user/request-reset-password",
-    "PUT",
-    {},
+  const { res, error } = await request("/user/request-reset-password", {
+    method: "PUT",
     body,
-    true,
-    false,
-  );
+    allowCache: false,
+  });
   if (res?.status === 202) {
     return { error: "", sent: true };
   } else {
@@ -180,28 +178,38 @@ export async function requestResetPassword(
   }
 }
 
-async function request(
+const request = async (
   path: string,
-  method?: string,
-  headers?: { [key: string]: string },
-  body?: BodyInit,
-  isJson?: boolean,
-  allowCache?: boolean,
-) {
-  const headers2 = headers || {};
+  {
+    method = "GET",
+    accessToken,
+    body,
+    isJson = true,
+    allowCache,
+  }: {
+    method?: string;
+    accessToken?: string;
+    body?: BodyInit;
+    isJson?: boolean;
+    allowCache: boolean;
+  },
+) => {
+  const headers: HeadersInit = {};
   if (isJson !== false) {
-    headers2["Content-Type"] = "application/json";
+    headers["Content-Type"] = "application/json";
+  }
+  if (accessToken) {
+    headers["Authorization"] = `Bearer ${accessToken}`;
   }
 
-  const url = `${BASE_URL}/api${path}`;
-
   const cacheStorage = await caches.open(CACHE_NAME);
+  const url = `${BASE_URL}/api${path}`;
 
   try {
     const res = await fetch(url, {
       method,
       body,
-      headers: headers2,
+      headers,
     });
     if (allowCache !== false) {
       await cacheStorage.put(url, res.clone());
@@ -220,7 +228,7 @@ async function request(
     console.error(err);
     return { res: null, error: "Internal error" };
   }
-}
+};
 
 function getError(response: Response) {
   if (response.ok) {

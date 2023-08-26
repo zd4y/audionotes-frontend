@@ -42,6 +42,7 @@ const Audios = () => {
   const [audioCardSize, setAudioCardSize] = createSignal(0);
   const [containerMargin, setContainerMargin] = createSignal(0);
   const [successMsg, setSuccessMsg] = createSignal("");
+  const [infoMsg, setInfoMsg] = createSignal("");
   let timeoutId = 0;
 
   onMount(async () => {
@@ -105,19 +106,23 @@ const Audios = () => {
 
   const onRecordingBtnClick = () => {
     setSuccessMsg("");
+    setInfoMsg("");
     setRecordingAudio((recording) => !recording);
     setRecordingAudioOpen(true);
   };
 
   const onSaveRecording = async (blob: Blob) => {
     setSuccessMsg("");
+    setInfoMsg("");
     setUploading(true);
     setRecordingAudio(false);
     setRecordingAudioOpen(false);
-    const { error } = await newAudio(accessToken(), blob);
+    const { error, info } = await newAudio(accessToken(), blob);
     setUploading(false);
     if (error) {
       setError(error);
+    } else if (info) {
+      setInfoMsg(info);
     } else {
       setSuccessMsg("Recording saved successfully");
       await callGetAudios();
@@ -133,6 +138,9 @@ const Audios = () => {
           </Show>
           <Show when={successMsg()}>
             <Alert severity="success">{successMsg()}</Alert>
+          </Show>
+          <Show when={infoMsg()}>
+            <Alert severity="info">{infoMsg()}</Alert>
           </Show>
           <Show when={uploading()}>
             <Alert severity="info">Uploading audio...</Alert>

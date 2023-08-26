@@ -112,14 +112,20 @@ export async function getAudioFile(
 export async function newAudio(
   accessToken: string,
   blob: Blob,
-): Promise<{ error: string }> {
+): Promise<{ error: string; info: string }> {
   const { error } = await request(`/audios`, {
     method: "POST",
     accessToken,
     allowCache: false,
     body: blob,
   });
-  return { error };
+  if (error === "Internal error") {
+    return {
+      error: "",
+      info: "The audio will be uploaded once the connection is restored",
+    };
+  }
+  return { error, info: "" };
 }
 
 interface ResetPasswordData {

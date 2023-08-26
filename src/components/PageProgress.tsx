@@ -10,7 +10,7 @@ const PageProgress = () => {
         height: "100vh",
       }}
     >
-      <Fade in style={{ transitionDelay: "200ms" }} unmountOnExit>
+      <Fade in style={{ transitionDelay: "400ms" }} unmountOnExit>
         <CircularProgress />
       </Fade>
     </Box>

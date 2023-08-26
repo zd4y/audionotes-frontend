@@ -43,7 +43,7 @@ export default defineConfig(({ mode }) => {
       runtimeCaching: [
         {
           handler: "NetworkOnly",
-          urlPattern: new RegExp(env.VITE_API_BASE_URL + "/api/.*", "i"),
+          urlPattern: new RegExp(env.VITE_API_BASE_URL + "/api/audios", "i"),
           method: "POST",
           options: {
             backgroundSync: {

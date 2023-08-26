@@ -1,4 +1,4 @@
-import { Box, CircularProgress } from "@suid/material";
+import { Box, CircularProgress, Fade } from "@suid/material";
 
 const PageProgress = () => {
   return (
@@ -10,7 +10,9 @@ const PageProgress = () => {
         height: "100vh",
       }}
     >
-      <CircularProgress />
+      <Fade in style={{ transitionDelay: "200ms" }} unmountOnExit>
+        <CircularProgress />
+      </Fade>
     </Box>
   );
 };

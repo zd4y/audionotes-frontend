@@ -216,10 +216,7 @@ const request = async (
   const url = `${BASE_URL}/api${path}`;
 
   if (getCached) {
-    let res = await cacheStorage.match(url);
-    if (!res?.ok) {
-      res = undefined;
-    }
+    const res = await cacheStorage.match(url);
     const error = res ? getError(res) : "";
     return { res, error };
   }
@@ -230,7 +227,7 @@ const request = async (
       body,
       headers,
     });
-    if (allowCache !== false) {
+    if (allowCache !== false && res.ok) {
       await cacheStorage.put(url, res.clone());
     }
     return { res, error: getError(res) };

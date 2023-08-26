@@ -102,6 +102,7 @@ const Audios = () => {
     );
     setAudios(audios2);
     setError(error2);
+    setLoading(false);
   };
 
   const onRecordingBtnClick = () => {

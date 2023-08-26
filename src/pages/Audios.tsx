@@ -49,7 +49,7 @@ const Audios = () => {
     let { audios, error } = await getAudios(true, accessToken());
     setAudios(audios);
     setError(error);
-    setLoading(false);
+    setLoading(audios ? false : true);
     calculateAudioCardSize();
 
     await callGetAudios();

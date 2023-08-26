@@ -216,7 +216,10 @@ const request = async (
   const url = `${BASE_URL}/api${path}`;
 
   if (getCached) {
-    const res = (await cacheStorage.match(url)) || null;
+    let res = await cacheStorage.match(url);
+    if (!res?.ok) {
+      res = undefined;
+    }
     const error = res ? getError(res) : "";
     return { res, error };
   }

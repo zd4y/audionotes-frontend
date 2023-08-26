@@ -58,8 +58,8 @@ export const AuthProvider: ParentComponent = (props) => {
     loading,
     error,
     login(token: string) {
-      localStorage.setItem("access_token", token);
       setAccessToken(token);
+      localStorage.setItem("access_token", token);
     },
     logout() {
       localStorage.removeItem("access_token");

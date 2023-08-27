@@ -61,7 +61,7 @@ const Audio = () => {
           {(audio) => (
             <>
               <Stack direction="row" sx={{ mb: 4 }} alignItems="center">
-                <Typography variant="h4">{createdAt()}</Typography>
+                <Typography variant="h5">{createdAt()}</Typography>
                 <IconButton
                   onClick={handleDeleteButtonClick}
                   sx={{

@@ -100,7 +100,7 @@ const AudioPlayer: Component<{
   };
 
   createEffect(() => {
-    const p = Math.ceil((progress() / Math.floor(duration())) * 100) || 0;
+    const p = Math.floor((progress() / Math.floor(duration())) * 100) || 0;
     slider.style.setProperty("--val", `${p}%`);
   });
 

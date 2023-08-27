@@ -6,10 +6,16 @@ export interface Audio {
   length: number;
   transcription: string;
   created_at: string;
+  tags: Tag[];
 }
 
 export interface User {
   email: string;
+}
+
+export interface Tag {
+  name: string;
+  color: string | null;
 }
 
 interface AuthorizeData {

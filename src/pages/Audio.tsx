@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { Show, createSignal, onMount } from "solid-js";
+import { For, Show, createSignal, onMount } from "solid-js";
 import { getAudio, Audio as ApiAudio, getAudioFile, deleteAudio } from "../api";
 import { useAuthenticated } from "../auth";
 import {
@@ -7,6 +7,7 @@ import {
   Box,
   Card,
   CardContent,
+  Chip,
   Container,
   IconButton,
   Stack,
@@ -85,6 +86,17 @@ const Audio = () => {
                   </Show>
                 </CardContent>
               </Card>
+              <Stack direction="row" mt={2} spacing={1}>
+                <For each={audio().tags}>
+                  {(tag) => (
+                    <Chip
+                      label={tag.name}
+                      variant="filled"
+                      sx={{ backgroundColor: tag.color || undefined }}
+                    />
+                  )}
+                </For>
+              </Stack>
             </>
           )}
         </Show>

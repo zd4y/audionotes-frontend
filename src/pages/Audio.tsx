@@ -39,14 +39,16 @@ const Audio = () => {
       return;
     }
 
-    setLoading(true)
-    const { error } = await deleteAudio(accessToken(), id);
+    setLoading(true);
+    const { error, info } = await deleteAudio(accessToken(), id);
     if (error) {
       setError(error);
+    } else if (info) {
+      navigate("/", { state: { infoMsg: info } });
     } else {
       navigate("/", { state: { successMsg: "Audio deleted successfully" } });
     }
-    setLoading(false)
+    setLoading(false);
   };
 
   return (

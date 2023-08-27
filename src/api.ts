@@ -112,13 +112,19 @@ export async function getAudioFile(
 export async function deleteAudio(
   accessToken: string,
   audioId: number,
-): Promise<{ error: string }> {
+): Promise<{ error: string; info: string }> {
   const { error } = await request(`/audios/${audioId}`, {
     method: "DELETE",
     accessToken,
     allowCache: false,
   });
-  return { error };
+  if (error === "Internal error") {
+    return {
+      error: "",
+      info: "The audio will be deleted once the connection is restored",
+    };
+  }
+  return { error, info: "" };
 }
 
 export async function newAudio(

@@ -47,9 +47,12 @@ const Audios = () => {
   let timeoutId = 0;
 
   onMount(async () => {
-    const locationSuccessMsg = (location.state as any)?.successMsg;
-    if (locationSuccessMsg) {
-      setSuccessMsg(locationSuccessMsg);
+    const locationState = location.state as any;
+    if (locationState?.successMsg) {
+      setSuccessMsg(locationState.successMsg);
+    }
+    if (locationState?.infoMsg) {
+      setInfoMsg(locationState.infoMsg);
     }
     let { audios, error } = await getAudios(true, accessToken());
     setAudios(audios);

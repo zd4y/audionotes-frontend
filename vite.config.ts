@@ -54,6 +54,22 @@ export default defineConfig(({ mode }) => {
             },
           },
         },
+        {
+          handler: "NetworkOnly",
+          urlPattern: new RegExp(
+            env.VITE_API_BASE_URL + "/api/audios/\\d+",
+            "i",
+          ),
+          method: "DELETE",
+          options: {
+            backgroundSync: {
+              name: "deleteAudio",
+              options: {
+                maxRetentionTime: 24 * 60,
+              },
+            },
+          },
+        },
       ],
     },
   };

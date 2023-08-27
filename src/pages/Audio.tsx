@@ -4,12 +4,14 @@ import { getAudio, Audio as ApiAudio, getAudioFile } from "../api";
 import { useAuthenticated } from "../auth";
 import {
   Alert,
+  Box,
   Card,
   CardContent,
   Container,
   Typography,
 } from "@suid/material";
 import PageProgress from "../components/PageProgress";
+import AudioPlayer from "../components/AudioPlayer";
 
 const Audio = () => {
   const params = useParams();
@@ -17,7 +19,6 @@ const Audio = () => {
   const [error, setError] = createSignal("");
   const [loading, setLoading] = createSignal(true);
   const [audio, setAudio] = createSignal<ApiAudio | null>(null);
-  const [audioBlobUrl, setAudioBlobUrl] = createSignal("");
   const createdAt = () => new Date(audio()?.created_at!).toLocaleString();
 
   onMount(async () => {
@@ -26,12 +27,6 @@ const Audio = () => {
     setError(error);
     setAudio(audio);
     setLoading(false);
-    if (error) return;
-    const { blob, error: error2 } = await getAudioFile(accessToken(), audioId);
-    setError(error2);
-    if (error2 || blob === null) return;
-    const blobUrl = URL.createObjectURL(blob);
-    setAudioBlobUrl(blobUrl);
   });
 
   return (
@@ -57,12 +52,22 @@ const Audio = () => {
                     {audio().transcription}
                   </Show>
                 </CardContent>
-                <audio style="width: 100%" controls src={audioBlobUrl()} />
               </Card>
             </>
           )}
         </Show>
       </Container>
+      <Box sx={{ position: "fixed", bottom: 0, width: "100%" }}>
+        <Show when={audio()}>
+          {(audio) => (
+            <AudioPlayer
+              accessToken={accessToken()}
+              audio={audio()}
+              setError={setError}
+            />
+          )}
+        </Show>
+      </Box>
     </Show>
   );
 };

@@ -53,7 +53,7 @@ const Audio = () => {
 
   return (
     <Show when={!loading()} fallback={<PageProgress />}>
-      <Container sx={{ mt: 15, mb: 15 }}>
+      <Container sx={{ mt: { xs: 3, md: 5, lg: 15 }, mb: 15 }}>
         <Show when={error()}>
           <Alert severity="error">{error()}</Alert>
         </Show>

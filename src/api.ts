@@ -109,11 +109,23 @@ export async function getAudioFile(
   return { error, blob };
 }
 
+export async function deleteAudio(
+  accessToken: string,
+  audioId: number,
+): Promise<{ error: string }> {
+  const { error } = await request(`/audios/${audioId}`, {
+    method: "DELETE",
+    accessToken,
+    allowCache: false,
+  });
+  return { error };
+}
+
 export async function newAudio(
   accessToken: string,
   blob: Blob,
 ): Promise<{ error: string; info: string }> {
-  const { error } = await request(`/audios`, {
+  const { error } = await request("/audios", {
     method: "POST",
     accessToken,
     allowCache: false,
@@ -203,7 +215,7 @@ const request = async (
     allowCache: boolean;
     getCached?: boolean;
   },
-) => {
+): Promise<{ res: Response | null; error: string }> => {
   const headers: HeadersInit = {};
   if (isJson !== false) {
     headers["Content-Type"] = "application/json";
@@ -216,7 +228,7 @@ const request = async (
   const url = `${BASE_URL}/api${path}`;
 
   if (getCached) {
-    const res = await cacheStorage.match(url);
+    const res = (await cacheStorage.match(url)) || null;
     const error = res ? getError(res) : "";
     return { res, error };
   }

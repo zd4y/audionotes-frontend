@@ -24,7 +24,7 @@ import {
   useTheme,
 } from "@suid/material";
 import PageProgress from "../components/PageProgress";
-import { A } from "@solidjs/router";
+import { A, useLocation } from "@solidjs/router";
 import { Mic, Stop } from "@suid/icons-material";
 import WaveSurfer from "wavesurfer.js";
 import RecordPlugin from "wavesurfer.js/plugins/record";
@@ -43,9 +43,14 @@ const Audios = () => {
   const [containerMargin, setContainerMargin] = createSignal(0);
   const [successMsg, setSuccessMsg] = createSignal("");
   const [infoMsg, setInfoMsg] = createSignal("");
+  const location = useLocation();
   let timeoutId = 0;
 
   onMount(async () => {
+    const locationSuccessMsg = (location.state as any)?.successMsg;
+    if (locationSuccessMsg) {
+      setSuccessMsg(locationSuccessMsg);
+    }
     let { audios, error } = await getAudios(true, accessToken());
     setAudios(audios);
     setError(error);

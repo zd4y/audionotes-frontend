@@ -1,6 +1,6 @@
-import { useParams } from "@solidjs/router";
+import { useNavigate, useParams } from "@solidjs/router";
 import { Show, createSignal, onMount } from "solid-js";
-import { getAudio, Audio as ApiAudio, getAudioFile } from "../api";
+import { getAudio, Audio as ApiAudio, getAudioFile, deleteAudio } from "../api";
 import { useAuthenticated } from "../auth";
 import {
   Alert,
@@ -8,13 +8,17 @@ import {
   Card,
   CardContent,
   Container,
+  IconButton,
+  Stack,
   Typography,
 } from "@suid/material";
 import PageProgress from "../components/PageProgress";
 import AudioPlayer from "../components/AudioPlayer";
+import { Delete } from "@suid/icons-material";
 
 const Audio = () => {
   const params = useParams();
+  const navigate = useNavigate();
   const accessToken = useAuthenticated();
   const [error, setError] = createSignal("");
   const [loading, setLoading] = createSignal(true);
@@ -29,6 +33,22 @@ const Audio = () => {
     setLoading(false);
   });
 
+  const handleDeleteButtonClick = async () => {
+    const id = audio()?.id;
+    if (!id) {
+      return;
+    }
+
+    setLoading(true)
+    const { error } = await deleteAudio(accessToken(), id);
+    if (error) {
+      setError(error);
+    } else {
+      navigate("/", { state: { successMsg: "Audio deleted successfully" } });
+    }
+    setLoading(false)
+  };
+
   return (
     <Show when={!loading()} fallback={<PageProgress />}>
       <Container sx={{ mt: 15, mb: 15 }}>
@@ -38,9 +58,19 @@ const Audio = () => {
         <Show when={audio()}>
           {(audio) => (
             <>
-              <Typography sx={{ mb: 4 }} variant="h4">
-                {createdAt()}
-              </Typography>
+              <Stack direction="row" sx={{ mb: 4 }} alignItems="center">
+                <Typography variant="h4">{createdAt()}</Typography>
+                <IconButton
+                  onClick={handleDeleteButtonClick}
+                  sx={{
+                    ml: "auto",
+                    "&:hover": { color: "error.main" },
+                    transition: "color 200ms ease",
+                  }}
+                >
+                  <Delete />
+                </IconButton>
+              </Stack>
               <Card>
                 <CardContent>
                   <Show

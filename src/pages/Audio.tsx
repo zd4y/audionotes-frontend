@@ -60,7 +60,7 @@ const Audio = () => {
         <Show when={audio()}>
           {(audio) => (
             <>
-              <Stack direction="row" sx={{ mb: 4 }} alignItems="center">
+              <Stack direction="row" sx={{ mb: 2 }} alignItems="center">
                 <Typography variant="h5">{createdAt()}</Typography>
                 <IconButton
                   onClick={handleDeleteButtonClick}

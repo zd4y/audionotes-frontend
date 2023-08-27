@@ -141,7 +141,7 @@ const Audios = () => {
   return (
     <>
       <Show when={!loading() && audioCardSize()} fallback={<PageProgress />}>
-        <Container sx={{ mb: 2, mt: { xs: 5, lg: 15 } }}>
+        <Container sx={{ mb: 2, mt: { xs: 3, md: 5, lg: 15 } }}>
           <Show when={error()}>
             <Alert severity="error">{error()}</Alert>
           </Show>

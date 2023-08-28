@@ -84,7 +84,13 @@ const Audio = () => {
                   <Delete />
                 </IconButton>
               </Stack>
-              <Card>
+              <Card
+                sx={{
+                  backgroundColor: audio().transcription
+                    ? "background.paper"
+                    : "#e0e0e0",
+                }}
+              >
                 <CardContent>
                   <Show
                     when={audio().transcription}

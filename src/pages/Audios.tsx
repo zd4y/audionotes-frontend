@@ -1,4 +1,11 @@
-import { Component, Show, createEffect, createSignal, onMount } from "solid-js";
+import {
+  Component,
+  Show,
+  createEffect,
+  createSignal,
+  lazy,
+  onMount,
+} from "solid-js";
 import { useAuthenticated } from "../auth";
 import { getAudios, Audio, newAudio } from "../api";
 import {
@@ -8,14 +15,18 @@ import {
   DialogContent,
   DialogTitle,
   Fab,
+  IconButton,
+  Stack,
+  useMediaQuery,
   useTheme,
 } from "@suid/material";
 import PageProgress from "../components/PageProgress";
 import { useLocation } from "@solidjs/router";
-import { Mic, Stop } from "@suid/icons-material";
+import { GridView, Mic, Stop, ViewList } from "@suid/icons-material";
 import WaveSurfer from "wavesurfer.js";
 import RecordPlugin from "wavesurfer.js/plugins/record";
-import AudiosGrid from "../components/AudiosGrid";
+const AudiosGrid = lazy(() => import("../components/AudiosGrid"));
+const AudiosTable = lazy(() => import("../components/AudiosTable"));
 
 const Audios = () => {
   const accessToken = useAuthenticated();
@@ -27,9 +38,16 @@ const Audios = () => {
   const [recordingAudioOpen, setRecordingAudioOpen] = createSignal(false);
   const [successMsg, setSuccessMsg] = createSignal("");
   const [infoMsg, setInfoMsg] = createSignal("");
+  const [inGridView, setInGridView] = createSignal(true);
+  const onLargeScreen = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const location = useLocation();
 
   onMount(async () => {
+    const savedView = localStorage.getItem("view");
+    if (savedView === "table") {
+      setInGridView(false);
+    }
+
     const locationState = location.state as any;
     if (locationState?.successMsg) {
       setSuccessMsg(locationState.successMsg);
@@ -83,10 +101,35 @@ const Audios = () => {
     }
   };
 
+  const handleViewChange = (newView: string) => {
+    if (newView === "table") {
+      setInGridView(false);
+    } else {
+      setInGridView(true);
+    }
+    localStorage.setItem("view", newView);
+  };
+
   return (
     <>
+      <Show when={onLargeScreen()}>
+        <Stack direction="row" justifyContent="end" mt={3} mr={3}>
+          <IconButton
+            color={inGridView() ? "primary" : "default"}
+            onClick={() => handleViewChange("grid")}
+          >
+            <GridView />
+          </IconButton>
+          <IconButton
+            color={inGridView() ? "default" : "primary"}
+            onClick={() => handleViewChange("table")}
+          >
+            <ViewList />
+          </IconButton>
+        </Stack>
+      </Show>
       <Show when={!loading()} fallback={<PageProgress />}>
-        <Container sx={{ mb: 2, mt: { xs: 3, md: 5, lg: 15 } }}>
+        <Container sx={{ mb: 2, mt: { xs: 3, md: 5, lg: 10 } }}>
           <Show when={error()}>
             <Alert severity="error">{error()}</Alert>
           </Show>
@@ -100,7 +143,22 @@ const Audios = () => {
             <Alert severity="info">Uploading audio...</Alert>
           </Show>
         </Container>
-        <AudiosGrid audios={audios()} />
+        <Show
+          when={inGridView()}
+          fallback={
+            <AudiosTable
+              audios={audios()}
+              accessToken={accessToken()}
+              setError={setError}
+              setInfoMsg={setInfoMsg}
+              setSuccessMsg={setSuccessMsg}
+              setLoading={setLoading}
+              refreshAudios={callGetAudios}
+            />
+          }
+        >
+          <AudiosGrid audios={audios()} />
+        </Show>
       </Show>
       <Fab
         onClick={onRecordingBtnClick}

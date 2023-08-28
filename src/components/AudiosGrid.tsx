@@ -101,7 +101,9 @@ const AudioCard: Component<{ audio: Audio; size: number }> = (props) => {
           height: props.size,
           marginRight: `${SPACE_BETWEEN_CARDS}px`,
           marginBottom: `${SPACE_BETWEEN_CARDS}px`,
-          backgroundColor: props.audio.transcription ? "#fff" : "#e0e0e0",
+          backgroundColor: props.audio.transcription
+            ? "background.paper"
+            : "#e0e0e0",
         }}
       >
         <CardContent>

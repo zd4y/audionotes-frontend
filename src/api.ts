@@ -142,6 +142,7 @@ export async function newAudio(
     accessToken,
     allowCache: false,
     body: blob,
+    isJson: false,
   });
   if (error === "Internal error") {
     return {
@@ -229,7 +230,7 @@ const request = async (
   },
 ): Promise<{ res: Response | null; error: string }> => {
   const headers: HeadersInit = {};
-  if (isJson !== false) {
+  if (body && isJson !== false) {
     headers["Content-Type"] = "application/json";
   }
   if (accessToken) {

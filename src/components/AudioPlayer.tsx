@@ -14,7 +14,7 @@ import {
   Stack,
   Typography,
 } from "@suid/material";
-import { Pause, PlayArrow } from "@suid/icons-material";
+import { PauseCircle, PlayCircle } from "@suid/icons-material";
 import styles from "./AudioPlayer.module.css";
 
 const AudioPlayer: Component<{
@@ -120,12 +120,14 @@ const AudioPlayer: Component<{
         />
       </Show>
       <IconButton onClick={handlePlayingToggle}>
-        <Switch fallback={<PlayArrow htmlColor="#eee" sx={{ fontSize: 50 }} />}>
+        <Switch
+          fallback={<PlayCircle htmlColor="#eee" sx={{ fontSize: 50 }} />}
+        >
           <Match when={loading()}>
             <CircularProgress size={50} sx={{ color: "#eee" }} />
           </Match>
           <Match when={playing()}>
-            <Pause htmlColor="#eee" sx={{ fontSize: 50 }} />
+            <PauseCircle htmlColor="#eee" sx={{ fontSize: 50 }} />
           </Match>
         </Switch>
       </IconButton>

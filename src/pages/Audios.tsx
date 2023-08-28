@@ -261,7 +261,12 @@ const RecordAudio: Component<{
       barGap: 4,
       barRadius: 2,
     });
-    record = waveSurfer.registerPlugin(RecordPlugin.create());
+    record = waveSurfer.registerPlugin(
+      RecordPlugin.create({
+        renderRecordedAudio: false,
+        mimeType: "audio/webm",
+      }),
+    );
     record.on("record-end", (blob: Blob) => {
       setBlob(() => blob);
     });

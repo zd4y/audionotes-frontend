@@ -1,50 +1,33 @@
-import {
-  Component,
-  For,
-  Show,
-  createEffect,
-  createSignal,
-  onCleanup,
-  onMount,
-} from "solid-js";
+import { Component, Show, createEffect, createSignal, onMount } from "solid-js";
 import { useAuthenticated } from "../auth";
-import { getAudios, Audio as ApiAudio, newAudio } from "../api";
+import { getAudios, Audio, newAudio } from "../api";
 import {
   Alert,
-  Card,
-  CardContent,
   Container,
   Dialog,
   DialogContent,
   DialogTitle,
   Fab,
-  Grid,
-  Link,
-  Typography,
   useTheme,
 } from "@suid/material";
 import PageProgress from "../components/PageProgress";
-import { A, useLocation } from "@solidjs/router";
+import { useLocation } from "@solidjs/router";
 import { Mic, Stop } from "@suid/icons-material";
 import WaveSurfer from "wavesurfer.js";
 import RecordPlugin from "wavesurfer.js/plugins/record";
-
-const SPACE_BETWEEN_CARDS = 16;
+import AudiosGrid from "../components/AudiosGrid";
 
 const Audios = () => {
   const accessToken = useAuthenticated();
-  const [audios, setAudios] = createSignal<ApiAudio[]>([]);
+  const [audios, setAudios] = createSignal<Audio[]>([]);
   const [error, setError] = createSignal("");
   const [loading, setLoading] = createSignal(true);
   const [uploading, setUploading] = createSignal(false);
   const [recordingAudio, setRecordingAudio] = createSignal(false);
   const [recordingAudioOpen, setRecordingAudioOpen] = createSignal(false);
-  const [audioCardSize, setAudioCardSize] = createSignal(0);
-  const [containerMargin, setContainerMargin] = createSignal(0);
   const [successMsg, setSuccessMsg] = createSignal("");
   const [infoMsg, setInfoMsg] = createSignal("");
   const location = useLocation();
-  let timeoutId = 0;
 
   onMount(async () => {
     const locationState = location.state as any;
@@ -61,50 +44,9 @@ const Audios = () => {
     setAudios(cachedAudios);
     setError(cachedError);
     setLoading(cachedAudios.length > 0 ? false : true);
-    calculateAudioCardSize();
 
     await callGetAudios();
-    window.addEventListener("resize", handleWindowResize);
   });
-
-  onCleanup(() => {
-    window.removeEventListener("resize", handleWindowResize);
-    setAudioCardSize(0);
-    clearTimeout(timeoutId);
-  });
-
-  const handleWindowResize = () => {
-    clearTimeout(timeoutId);
-    timeoutId = window.setTimeout(() => calculateAudioCardSize(), 1000);
-  };
-
-  const calculateAudioCardSize = () => {
-    const windowSize = document.getElementById("root")!.clientWidth;
-
-    let initialSize = 150;
-    let containerMargin = 0;
-    if (windowSize >= 900) {
-      initialSize = 150;
-      containerMargin = 0.1 * windowSize;
-    } else if (windowSize >= 450) {
-      initialSize = 130;
-    } else if (windowSize > 360) {
-      initialSize = 150;
-    } else if (windowSize >= 150) {
-      initialSize = 100;
-    }
-
-    const totalSize = windowSize - containerMargin * 2;
-
-    const initialSpace = initialSize + SPACE_BETWEEN_CARDS;
-    const numOfCards = Math.floor(
-      (totalSize - SPACE_BETWEEN_CARDS) / initialSpace,
-    );
-    const remainingSpace = totalSize - SPACE_BETWEEN_CARDS * (numOfCards + 1);
-
-    setContainerMargin(Math.floor(containerMargin));
-    setAudioCardSize(Math.floor(remainingSpace / numOfCards));
-  };
 
   const callGetAudios = async () => {
     let { audios: audios2, error: error2 } = await getAudios(
@@ -143,7 +85,7 @@ const Audios = () => {
 
   return (
     <>
-      <Show when={!loading() && audioCardSize()} fallback={<PageProgress />}>
+      <Show when={!loading()} fallback={<PageProgress />}>
         <Container sx={{ mb: 2, mt: { xs: 3, md: 5, lg: 15 } }}>
           <Show when={error()}>
             <Alert severity="error">{error()}</Alert>
@@ -158,27 +100,7 @@ const Audios = () => {
             <Alert severity="info">Uploading audio...</Alert>
           </Show>
         </Container>
-        <Grid
-          container
-          sx={{ mb: { xs: 5, lg: 15 } }}
-          paddingLeft={`${containerMargin() + SPACE_BETWEEN_CARDS}px`}
-          paddingRight={`${containerMargin()}px`}
-        >
-          <For
-            each={audios()}
-            fallback={
-              <Grid item>
-                <Typography>No audios found.</Typography>
-              </Grid>
-            }
-          >
-            {(audio) => (
-              <Grid item>
-                <Audio audio={audio} size={audioCardSize()} />
-              </Grid>
-            )}
-          </For>
-        </Grid>
+        <AudiosGrid audios={audios()} />
       </Show>
       <Fab
         onClick={onRecordingBtnClick}
@@ -199,35 +121,6 @@ const Audios = () => {
         onSave={onSaveRecording}
       />
     </>
-  );
-};
-
-const Audio: Component<{ audio: ApiAudio; size: number }> = (props) => {
-  return (
-    <Link
-      component={A}
-      href={`/${props.audio.id}`}
-      sx={{ textDecoration: "none" }}
-    >
-      <Card
-        sx={{
-          width: props.size,
-          height: props.size,
-          marginRight: `${SPACE_BETWEEN_CARDS}px`,
-          marginBottom: `${SPACE_BETWEEN_CARDS}px`,
-          backgroundColor: props.audio.transcription ? "#fff" : "#e0e0e0",
-        }}
-      >
-        <CardContent>
-          <Show
-            when={props.audio.transcription}
-            fallback={<Typography fontStyle="italic">Processing</Typography>}
-          >
-            {props.audio.transcription}
-          </Show>
-        </CardContent>
-      </Card>
-    </Link>
   );
 };
 

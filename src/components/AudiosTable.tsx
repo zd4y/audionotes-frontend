@@ -30,7 +30,7 @@ const AudiosTable: Component<{
       <TableContainer>
         <Table>
           <TableBody>
-            <For each={props.audios}>
+            <For each={props.audios} fallback={<p>No audios found</p>}>
               {(audio) => (
                 <>
                   <AudioTableRow

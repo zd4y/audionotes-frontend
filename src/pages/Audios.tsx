@@ -72,7 +72,7 @@ const Audios = () => {
 
   const handleWindowResize = () => {
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => calculateAudioCardSize(), 1000);
+    timeoutId = window.setTimeout(() => calculateAudioCardSize(), 1000);
   };
 
   const calculateAudioCardSize = () => {
@@ -260,7 +260,7 @@ const RecordAudio: Component<{
     });
     record = waveSurfer.registerPlugin(RecordPlugin.create());
     record.on("record-end", (blob: Blob) => {
-      setBlob(blob);
+      setBlob(() => blob);
     });
     record.startRecording();
   });

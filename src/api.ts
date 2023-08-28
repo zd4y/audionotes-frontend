@@ -86,12 +86,14 @@ export async function getAudios(
 }
 
 export async function getAudio(
+  getCached: boolean,
   accessToken: string,
   audioId: number,
 ): Promise<{ error: string; audio: Audio | null }> {
   const { res, error } = await request(`/audios/${audioId}`, {
     accessToken,
     allowCache: true,
+    getCached,
   });
   let audio = null;
   if (res?.ok) {

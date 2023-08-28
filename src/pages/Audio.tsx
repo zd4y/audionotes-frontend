@@ -28,7 +28,17 @@ const Audio = () => {
 
   onMount(async () => {
     const audioId = parseInt(params.id);
-    const { audio, error } = await getAudio(accessToken(), audioId);
+
+    const { audio: cachedAudio, error: cachedError } = await getAudio(
+      true,
+      accessToken(),
+      audioId,
+    );
+    setError(cachedError);
+    setAudio(cachedAudio);
+    setLoading(cachedAudio ? false : true);
+
+    const { audio, error } = await getAudio(false, accessToken(), audioId);
     setError(error);
     setAudio(audio);
     setLoading(false);

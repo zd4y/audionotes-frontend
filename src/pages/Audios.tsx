@@ -54,10 +54,13 @@ const Audios = () => {
     if (locationState?.infoMsg) {
       setInfoMsg(locationState.infoMsg);
     }
-    let { audios, error } = await getAudios(true, accessToken());
-    setAudios(audios);
-    setError(error);
-    setLoading(audios.length > 0 ? false : true);
+    let { audios: cachedAudios, error: cachedError } = await getAudios(
+      true,
+      accessToken(),
+    );
+    setAudios(cachedAudios);
+    setError(cachedError);
+    setLoading(cachedAudios.length > 0 ? false : true);
     calculateAudioCardSize();
 
     await callGetAudios();

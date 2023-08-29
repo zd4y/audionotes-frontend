@@ -108,7 +108,10 @@ const AudioTableRow: Component<{
           <Typography>{props.audio.transcription}</Typography>
         </Show>
       </TableCell>
-      <TableCell padding="none" align="right">
+      <TableCell
+        padding={props.audio.tags.length > 0 ? "checkbox" : "none"}
+        align="right"
+      >
         <Stack direction="row" spacing={1} justifyContent="end">
           <For each={props.audio.tags}>
             {(tag) => (

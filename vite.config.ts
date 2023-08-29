@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
       name: "AudioNotes",
       short_name: "AudioNotes",
       description: "Audio notes",
-      theme_color: "#eeeeee",
+      theme_color: "#EDF1F5",
       icons: [
         {
           src: "pwa-64x64.png",

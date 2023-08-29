@@ -15,6 +15,7 @@ import {
   Typography,
 } from "@suid/material";
 import { Delete } from "@suid/icons-material";
+import { A } from "@solidjs/router";
 
 const AudiosTable: Component<{
   audios: Audio[];
@@ -90,7 +91,12 @@ const AudioTableRow: Component<{
       <TableCell padding="checkbox">
         <Checkbox />
       </TableCell>
-      <TableCell align="left">
+      <TableCell
+        align="left"
+        component={A}
+        href={`/${props.audio.id}`}
+        sx={{ textDecoration: "none" }}
+      >
         <Show
           when={props.audio.transcription}
           fallback={
@@ -102,8 +108,8 @@ const AudioTableRow: Component<{
           <Typography>{props.audio.transcription}</Typography>
         </Show>
       </TableCell>
-      <TableCell padding="checkbox">
-        <Stack direction="row" spacing={1}>
+      <TableCell padding="none" align="right">
+        <Stack direction="row" spacing={1} justifyContent="end">
           <For each={props.audio.tags}>
             {(tag) => (
               <Chip

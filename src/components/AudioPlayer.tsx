@@ -121,17 +121,19 @@ const AudioPlayer: Component<{
       </Show>
       <IconButton onClick={handlePlayingToggle}>
         <Switch
-          fallback={<PlayCircle htmlColor="#eee" sx={{ fontSize: 50 }} />}
+          fallback={
+            <PlayCircle htmlColor="background.paper" sx={{ fontSize: 50 }} />
+          }
         >
           <Match when={loading()}>
-            <CircularProgress size={50} sx={{ color: "#eee" }} />
+            <CircularProgress size={50} sx={{ color: "background.paper" }} />
           </Match>
           <Match when={playing()}>
-            <PauseCircle htmlColor="#eee" sx={{ fontSize: 50 }} />
+            <PauseCircle htmlColor="background.paper" sx={{ fontSize: 50 }} />
           </Match>
         </Switch>
       </IconButton>
-      <Typography color="#eee" ml={1} mr={1}>
+      <Typography color="background.paper" ml={1} mr={1}>
         {calculateTime(progress())}
       </Typography>
       <input
@@ -143,7 +145,7 @@ const AudioPlayer: Component<{
         onInput={handleSliderInput}
         onChange={handleSliderChange}
       />
-      <Typography color="#eee" mr={2}>
+      <Typography color="background.paper" mr={2}>
         <Show when={duration() > 0}>{calculateTime(duration())}</Show>
       </Typography>
     </Stack>

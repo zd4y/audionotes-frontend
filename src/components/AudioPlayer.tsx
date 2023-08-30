@@ -121,9 +121,7 @@ const AudioPlayer: Component<{
       </Show>
       <IconButton onClick={handlePlayingToggle}>
         <Switch
-          fallback={
-            <PlayCircle htmlColor="#fff" sx={{ fontSize: 50 }} />
-          }
+          fallback={<PlayCircle htmlColor="#fff" sx={{ fontSize: 50 }} />}
         >
           <Match when={loading()}>
             <CircularProgress size={50} sx={{ color: "background.paper" }} />

@@ -54,12 +54,12 @@ const Audio = () => {
     const { error, info } = await deleteAudio(accessToken(), id);
     if (error) {
       setError(error);
+      setLoading(false);
     } else if (info) {
       navigate("/", { state: { infoMsg: info } });
     } else {
       navigate("/", { state: { successMsg: "Audio deleted successfully" } });
     }
-    setLoading(false);
   };
 
   return (

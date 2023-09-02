@@ -36,7 +36,10 @@ const Tags: Component<
   const [newTagColor, setNewTagColor] = createSignal("#2196f3");
   const [newTagName, setNewTagName] = createSignal("");
   const [newTagDialogOpen, setNewTagDialogOpen] = createSignal(false);
-  const { tags, ...rest } = props;
+  const rest = () => {
+    const { tags: _, ...rest } = props;
+    return rest;
+  };
 
   const handleExistingTagSelect = async (event: SelectChangeEvent) => {
     const value = event.target.value as string;
@@ -68,8 +71,8 @@ const Tags: Component<
   };
 
   return (
-    <Stack direction="row" spacing={1} {...rest}>
-      <For each={tags}>
+    <Stack direction="row" spacing={1} {...rest()}>
+      <For each={props.tags}>
         {(tag) => (
           <Chip
             label={tag.name}

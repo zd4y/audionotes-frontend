@@ -45,18 +45,21 @@ const Audio = () => {
   const callGetAudio = async () => {
     const audioId = parseInt(params.id);
 
-    const { audio, error } = await getAudio(false, accessToken(), audioId);
-    setError(error);
-    setAudio(audio);
-    setLoading(false);
+    const audiosPromise = getAudio(false, accessToken(), audioId).then(
+      ({ audio, error }) => {
+        setError(error);
+        setAudio(audio);
+        setLoading(false);
+      },
+    );
 
-    if (error) {
-      return;
-    }
+    const tagsPromise = getTags(accessToken()).then(({ tags, error }) => {
+      setError(error);
+      setExistingTags(tags);
+    });
 
-    const { tags, error: error2 } = await getTags(accessToken());
-    setError(error2);
-    setExistingTags(tags);
+    await audiosPromise;
+    await tagsPromise;
   };
 
   const handleDeleteButtonClick = async () => {

@@ -25,7 +25,7 @@ const AudiosTable: Component<{
   setLoading: (loading: boolean) => void;
   refreshAudios: () => void;
 }> = (props) => {
-  const [existingTags, setExistingTags] = createSignal([]);
+  const [existingTags, setExistingTags] = createSignal<Tag[] | null>(null);
 
   onMount(async () => {
     const { tags, error } = await getTags(props.accessToken);
@@ -67,7 +67,7 @@ const AudiosTable: Component<{
 
 const AudioTableRow: Component<{
   audio: Audio;
-  existingTags: Tag[];
+  existingTags: Tag[] | null;
   accessToken: string;
   setError: (error: string) => void;
   setInfoMsg: (msg: string) => void;
@@ -127,7 +127,8 @@ const AudioTableRow: Component<{
         <Tags
           audioId={props.audio.id}
           tags={props.audio.tags}
-          existingTags={props.existingTags}
+          existingTags={props.existingTags || []}
+          existingTagsLoading={props.existingTags === null}
           setError={props.setError}
           refresh={props.refreshAudios}
           accessToken={props.accessToken}

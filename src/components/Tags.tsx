@@ -15,7 +15,7 @@ import {
   TextField,
   Typography,
 } from "@suid/material";
-import { Component, For, createSignal } from "solid-js";
+import { Component, For, Show, createSignal } from "solid-js";
 import { Tag } from "../api";
 import { AddCircle } from "@suid/icons-material";
 import { StackProps } from "@suid/material/Stack";
@@ -27,6 +27,7 @@ const Tags: Component<
     audioId: number;
     tags: Tag[];
     existingTags: Tag[];
+    existingTagsLoading: boolean;
     accessToken: string;
     setError: (error: string) => void;
     refresh: () => void;
@@ -81,9 +82,11 @@ const Tags: Component<
           />
         )}
       </For>
-      <IconButton size="small" color="primary" onClick={handleNewTagBtnClick}>
-        <AddCircle fontSize="inherit" />
-      </IconButton>
+      <Show when={!props.existingTagsLoading}>
+        <IconButton size="small" color="primary" onClick={handleNewTagBtnClick}>
+          <AddCircle fontSize="inherit" />
+        </IconButton>
+      </Show>
       <Dialog
         open={newTagDialogOpen()}
         onClose={() => setNewTagDialogOpen(false)}

@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "@solidjs/router";
 import { Show, createSignal, onMount } from "solid-js";
-import { getAudio, Audio as ApiAudio, deleteAudio, getTags } from "../api";
+import { getAudio, Audio as ApiAudio, deleteAudio, getTags, Tag } from "../api";
 import { useAuthenticated } from "../auth";
 import {
   Alert,
@@ -24,7 +24,7 @@ const Audio = () => {
   const [error, setError] = createSignal("");
   const [loading, setLoading] = createSignal(true);
   const [audio, setAudio] = createSignal<ApiAudio | null>(null);
-  const [existingTags, setExistingTags] = createSignal([]);
+  const [existingTags, setExistingTags] = createSignal<Tag[] | null>(null);
   const createdAt = () => new Date(audio()?.created_at!).toLocaleString();
 
   onMount(async () => {
@@ -120,7 +120,8 @@ const Audio = () => {
               <Tags
                 audioId={audio().id}
                 tags={audio().tags}
-                existingTags={existingTags()}
+                existingTags={existingTags() || []}
+                existingTagsLoading={existingTags() === null}
                 setError={setError}
                 refresh={callGetAudio}
                 accessToken={accessToken()}

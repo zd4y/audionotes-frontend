@@ -67,12 +67,9 @@ const Audios = () => {
   });
 
   const callGetAudios = async () => {
-    let { audios: audios2, error: error2 } = await getAudios(
-      false,
-      accessToken(),
-    );
-    setAudios(audios2);
-    setError(error2);
+    let { audios, error } = await getAudios(false, accessToken());
+    setAudios(audios);
+    setError(error);
     setLoading(false);
   };
 

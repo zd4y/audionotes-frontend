@@ -1,13 +1,12 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { For, Show, createSignal, onMount } from "solid-js";
-import { getAudio, Audio as ApiAudio, getAudioFile, deleteAudio } from "../api";
+import { Show, createSignal, onMount } from "solid-js";
+import { getAudio, Audio as ApiAudio, deleteAudio, getTags } from "../api";
 import { useAuthenticated } from "../auth";
 import {
   Alert,
   Box,
   Card,
   CardContent,
-  Chip,
   Container,
   IconButton,
   Stack,
@@ -16,6 +15,7 @@ import {
 import PageProgress from "../components/PageProgress";
 import AudioPlayer from "../components/AudioPlayer";
 import { Delete } from "@suid/icons-material";
+import Tags from "../components/Tags";
 
 const Audio = () => {
   const params = useParams();
@@ -24,6 +24,7 @@ const Audio = () => {
   const [error, setError] = createSignal("");
   const [loading, setLoading] = createSignal(true);
   const [audio, setAudio] = createSignal<ApiAudio | null>(null);
+  const [existingTags, setExistingTags] = createSignal([]);
   const createdAt = () => new Date(audio()?.created_at!).toLocaleString();
 
   onMount(async () => {
@@ -38,11 +39,25 @@ const Audio = () => {
     setAudio(cachedAudio);
     setLoading(cachedAudio ? false : true);
 
+    await callGetAudio();
+  });
+
+  const callGetAudio = async () => {
+    const audioId = parseInt(params.id);
+
     const { audio, error } = await getAudio(false, accessToken(), audioId);
     setError(error);
     setAudio(audio);
     setLoading(false);
-  });
+
+    if (error) {
+      return;
+    }
+
+    const { tags, error: error2 } = await getTags(accessToken());
+    setError(error2);
+    setExistingTags(tags);
+  };
 
   const handleDeleteButtonClick = async () => {
     const id = audio()?.id;
@@ -102,17 +117,15 @@ const Audio = () => {
                   </Show>
                 </CardContent>
               </Card>
-              <Stack direction="row" mt={2} spacing={1}>
-                <For each={audio().tags}>
-                  {(tag) => (
-                    <Chip
-                      label={tag.name}
-                      variant="filled"
-                      sx={{ backgroundColor: tag.color || undefined }}
-                    />
-                  )}
-                </For>
-              </Stack>
+              <Tags
+                audioId={audio().id}
+                tags={audio().tags}
+                existingTags={existingTags()}
+                setError={setError}
+                refresh={callGetAudio}
+                accessToken={accessToken()}
+                mt={2}
+              />
             </>
           )}
         </Show>

@@ -155,6 +155,42 @@ export async function newAudio(
   return { error, info: "" };
 }
 
+export async function getTags(accessToken: string) {
+  const { res, error } = await request("/audios/tags", {
+    accessToken,
+    allowCache: true,
+  });
+  let tags = [];
+  if (res?.ok) {
+    tags = await res.json();
+  }
+  return { tags, error };
+}
+
+interface TagAudioData {
+  name: string;
+  color?: string;
+}
+
+export async function tagAudio(
+  accessToken: string,
+  audioId: number,
+  tagData: TagAudioData,
+) {
+  const body = JSON.stringify(tagData);
+  const { res, error } = await request(`/audios/${audioId}/tags`, {
+    method: "PUT",
+    accessToken,
+    allowCache: false,
+    body,
+    isJson: true,
+  });
+  if (res) {
+    return { error: getError(res) };
+  }
+  return { error };
+}
+
 interface ResetPasswordData {
   user_id: number;
   token: string;

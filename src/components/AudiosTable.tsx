@@ -1,12 +1,10 @@
-import { Component, For, Show } from "solid-js";
-import { Audio, deleteAudio } from "../api";
+import { Component, For, Show, createSignal, onMount } from "solid-js";
+import { Audio, Tag, deleteAudio, getTags } from "../api";
 import {
   Checkbox,
-  Chip,
   Container,
   Divider,
   IconButton,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -16,6 +14,7 @@ import {
 } from "@suid/material";
 import { Delete } from "@suid/icons-material";
 import { A } from "@solidjs/router";
+import Tags from "./Tags";
 
 const AudiosTable: Component<{
   audios: Audio[];
@@ -26,6 +25,17 @@ const AudiosTable: Component<{
   setLoading: (loading: boolean) => void;
   refreshAudios: () => void;
 }> = (props) => {
+  const [existingTags, setExistingTags] = createSignal([]);
+
+  onMount(async () => {
+    const { tags, error } = await getTags(props.accessToken);
+    if (error) {
+      props.setError(error);
+    } else {
+      setExistingTags(tags);
+    }
+  });
+
   return (
     <Container sx={{ mb: 10 }}>
       <TableContainer>
@@ -36,6 +46,7 @@ const AudiosTable: Component<{
                 <>
                   <AudioTableRow
                     audio={audio}
+                    existingTags={existingTags()}
                     accessToken={props.accessToken}
                     setError={props.setError}
                     setInfoMsg={props.setInfoMsg}
@@ -56,6 +67,7 @@ const AudiosTable: Component<{
 
 const AudioTableRow: Component<{
   audio: Audio;
+  existingTags: Tag[];
   accessToken: string;
   setError: (error: string) => void;
   setInfoMsg: (msg: string) => void;
@@ -112,17 +124,15 @@ const AudioTableRow: Component<{
         padding={props.audio.tags.length > 0 ? "checkbox" : "none"}
         align="right"
       >
-        <Stack direction="row" spacing={1} justifyContent="end">
-          <For each={props.audio.tags}>
-            {(tag) => (
-              <Chip
-                label={tag.name}
-                variant="filled"
-                sx={{ backgroundColor: tag.color || undefined }}
-              />
-            )}
-          </For>
-        </Stack>
+        <Tags
+          audioId={props.audio.id}
+          tags={props.audio.tags}
+          existingTags={props.existingTags}
+          setError={props.setError}
+          refresh={props.refreshAudios}
+          accessToken={props.accessToken}
+          justifyContent="end"
+        />
       </TableCell>
       <TableCell padding="checkbox">
         <IconButton onClick={handleDeleteButtonClick}>

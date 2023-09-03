@@ -35,7 +35,9 @@ const Audio = () => {
       accessToken(),
       audioId,
     );
-    setError(cachedError);
+    if (cachedError) {
+      setError(cachedError);
+    }
     setAudio(cachedAudio);
     setLoading(cachedAudio ? false : true);
 
@@ -47,14 +49,18 @@ const Audio = () => {
 
     const audiosPromise = getAudio(false, accessToken(), audioId).then(
       ({ audio, error }) => {
-        setError(error);
+        if (error) {
+          setError(error);
+        }
         setAudio(audio);
         setLoading(false);
       },
     );
 
     const tagsPromise = getTags(accessToken()).then(({ tags, error }) => {
-      setError(error);
+      if (error) {
+        setError(error);
+      }
       setExistingTags(tags);
     });
 

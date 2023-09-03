@@ -60,7 +60,9 @@ const Audios = () => {
       accessToken(),
     );
     setAudios(cachedAudios);
-    setError(cachedError);
+    if (cachedError) {
+      setError(cachedError);
+    }
     setLoading(cachedAudios.length > 0 ? false : true);
 
     await callGetAudios();
@@ -69,7 +71,9 @@ const Audios = () => {
   const callGetAudios = async () => {
     let { audios, error } = await getAudios(false, accessToken());
     setAudios(audios);
-    setError(error);
+    if (error) {
+      setError(error);
+    }
     setLoading(false);
   };
 

@@ -47,7 +47,9 @@ const AudioPlayer: Component<{
       props.accessToken,
       props.audio.id,
     );
-    props.setError(error);
+    if (error) {
+      props.setError(error);
+    }
     if (error || blob === null) return;
     setAudioBlobUrl(URL.createObjectURL(blob));
     if (audio.readyState > 0) {

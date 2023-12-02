@@ -126,7 +126,7 @@ export async function deleteAudio(
     accessToken,
     allowCache: false,
   });
-  if (error === "Internal error") {
+  if (error === "Offline") {
     return {
       error: "",
       info: "The audio will be deleted once the connection is restored",
@@ -146,7 +146,7 @@ export async function newAudio(
     body: blob,
     isJson: false,
   });
-  if (error === "Internal error") {
+  if (error === "Offline") {
     return {
       error: "",
       info: "The audio will be uploaded once the connection is restored",
@@ -302,6 +302,10 @@ const request = async (
 
     if (cachedResponse !== undefined) {
       return { res: cachedResponse, error: getError(cachedResponse) };
+    }
+
+    if (!navigator.onLine) {
+      return { res: null, error: "Offline" };
     }
 
     console.error(err);

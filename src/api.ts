@@ -27,7 +27,7 @@ export async function pingApi(retries: number): Promise<boolean> {
   if (retries === 0) {
     return false;
   }
-  const { res } = await request("/ping", { allowCache: true });
+  const { res } = await request("/ping", { allowCache: false });
   if (!res?.ok) {
     await sleep(1000);
     return await pingApi(retries - 1);

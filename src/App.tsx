@@ -29,16 +29,12 @@ const App: Component = () => {
   });
 
   return (
-    <Show
-      when={serverAvailable()}
+    <Switch
       fallback={
-        <Container sx={{ mt: 15 }}>
-          <Alert severity="error">Server unavailable</Alert>
-        </Container>
-      }
-    >
-      <Switch
-        fallback={
+        <>
+          <Show when={!serverAvailable()}>
+            <Alert severity="warning">Could not connect to server</Alert>
+          </Show>
           <Router>
             <Routes>
               <Route path="/" component={Audios} />
@@ -47,16 +43,16 @@ const App: Component = () => {
               <Route path="/reset-password" component={ResetPassword} />
             </Routes>
           </Router>
-        }
-      >
-        <Match when={error()}>
-          <Alert severity="error">{error()}</Alert>
-        </Match>
-        <Match when={loading()}>
-          <PageProgress />
-        </Match>
-      </Switch>
-    </Show>
+        </>
+      }
+    >
+      <Match when={error()}>
+        <Alert severity="error">{error()}</Alert>
+      </Match>
+      <Match when={loading()}>
+        <PageProgress />
+      </Match>
+    </Switch>
   );
 };
 

@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { Show, createSignal, onMount } from "solid-js";
+import { Show, createSignal, onCleanup, onMount } from "solid-js";
 import { getAudio, Audio as ApiAudio, deleteAudio, getTags, Tag } from "../api";
 import { useAuthenticated } from "../auth";
 import {
@@ -26,6 +26,14 @@ const Audio = () => {
   const [audio, setAudio] = createSignal<ApiAudio | null>(null);
   const [existingTags, setExistingTags] = createSignal<Tag[] | null>(null);
   const createdAt = () => new Date(audio()?.created_at!).toLocaleString();
+  const timer = setInterval(() => {
+    if (audio()?.transcription) {
+      clearInterval(timer);
+      return;
+    }
+
+    callGetAudio();
+  }, 1000);
 
   onMount(async () => {
     const audioId = parseInt(params.id);
@@ -41,21 +49,13 @@ const Audio = () => {
     setAudio(cachedAudio);
     setLoading(cachedAudio ? false : true);
 
-    await callGetAudio();
+    await fetchData();
   });
 
-  const callGetAudio = async () => {
-    const audioId = parseInt(params.id);
+  onCleanup(() => clearInterval(timer));
 
-    const audiosPromise = getAudio(false, accessToken(), audioId).then(
-      ({ audio, error }) => {
-        if (error) {
-          setError(error);
-        }
-        setAudio(audio);
-        setLoading(false);
-      },
-    );
+  const fetchData = async () => {
+    const audiosPromise = callGetAudio();
 
     const tagsPromise = getTags(accessToken()).then(({ tags, error }) => {
       if (error) {
@@ -66,6 +66,16 @@ const Audio = () => {
 
     await audiosPromise;
     await tagsPromise;
+  };
+
+  const callGetAudio = async () => {
+    const audioId = parseInt(params.id);
+    const { audio, error } = await getAudio(false, accessToken(), audioId);
+    if (error) {
+      setError(error);
+    }
+    setAudio(audio);
+    setLoading(false);
   };
 
   const handleDeleteButtonClick = async () => {
@@ -132,7 +142,7 @@ const Audio = () => {
                 existingTags={existingTags() || []}
                 existingTagsLoading={existingTags() === null}
                 setError={setError}
-                refresh={callGetAudio}
+                refresh={fetchData}
                 accessToken={accessToken()}
                 mt={2}
               />

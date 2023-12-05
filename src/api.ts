@@ -138,8 +138,8 @@ export async function deleteAudio(
 export async function newAudio(
   accessToken: string,
   blob: Blob,
-): Promise<{ error: string; info: string }> {
-  const { error } = await request("/audios", {
+): Promise<{ error: string; info: string; id: number }> {
+  const { res, error } = await request("/audios", {
     method: "POST",
     accessToken,
     allowCache: false,
@@ -152,7 +152,9 @@ export async function newAudio(
       info: "The audio will be uploaded once the connection is restored",
     };
   }
-  return { error, info: "" };
+  const resData = await res?.json();
+  const id = resData.id;
+  return { error, info: "", id };
 }
 
 export async function getTags(accessToken: string) {

@@ -4,10 +4,11 @@ import {
   createEffect,
   createSignal,
   lazy,
+  onCleanup,
   onMount,
 } from "solid-js";
 import { useAuthenticated } from "../auth";
-import { getAudios, Audio, newAudio } from "../api";
+import { getAudios, Audio, newAudio, getAudio } from "../api";
 import {
   Alert,
   Container,
@@ -34,6 +35,7 @@ const Audios = () => {
   const [error, setError] = createSignal("");
   const [loading, setLoading] = createSignal(true);
   const [uploading, setUploading] = createSignal(false);
+  const [newAudioId, setNewAudioId] = createSignal<number | null>(null);
   const [recordingAudio, setRecordingAudio] = createSignal(false);
   const [recordingAudioOpen, setRecordingAudioOpen] = createSignal(false);
   const [successMsg, setSuccessMsg] = createSignal("");
@@ -41,6 +43,35 @@ const Audios = () => {
   const [inGridView, setInGridView] = createSignal(true);
   const onLargeScreen = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const location = useLocation();
+  let newAudioTimer = 0;
+
+  createEffect(() => {
+    const audioId = newAudioId();
+    if (audioId === null) {
+      clearInterval(newAudioTimer);
+      return;
+    }
+
+    newAudioTimer = window.setInterval(() => {
+      let audioId = newAudioId();
+      if (audioId === null) {
+        clearInterval(newAudioTimer);
+        return;
+      }
+
+      for (let audio of audios()) {
+        if (audio.id === audioId) {
+          if (audio.transcription) {
+            clearInterval(newAudioTimer);
+            return;
+          }
+          break;
+        }
+      }
+
+      callGetAudio(audioId);
+    }, 1000);
+  });
 
   onMount(async () => {
     const savedView = localStorage.getItem("view");
@@ -68,13 +99,33 @@ const Audios = () => {
     await callGetAudios();
   });
 
+  onCleanup(() => clearInterval(newAudioTimer));
+
   const callGetAudios = async () => {
-    let { audios, error } = await getAudios(false, accessToken());
+    const { audios, error } = await getAudios(false, accessToken());
     setAudios(audios);
     if (error) {
       setError(error);
     }
     setLoading(false);
+  };
+
+  const callGetAudio = async (audioId: number) => {
+    const { audio: newAudio, error } = await getAudio(
+      false,
+      accessToken(),
+      audioId,
+    );
+    if (error) {
+      setError(error);
+    }
+    if (newAudio) {
+      setAudios((audios) => {
+        const idx = audios.findIndex((audio) => audio.id === audioId);
+        audios[idx] = newAudio;
+        return [...audios];
+      });
+    }
   };
 
   const onRecordingBtnClick = () => {
@@ -90,8 +141,9 @@ const Audios = () => {
     setUploading(true);
     setRecordingAudio(false);
     setRecordingAudioOpen(false);
-    const { error, info } = await newAudio(accessToken(), blob);
+    const { error, info, id } = await newAudio(accessToken(), blob);
     setUploading(false);
+    setNewAudioId(id);
     if (error) {
       setError(error);
     } else if (info) {

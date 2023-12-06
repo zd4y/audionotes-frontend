@@ -268,7 +268,7 @@ const RecordAudio: Component<{
     record = waveSurfer.registerPlugin(
       RecordPlugin.create({
         renderRecordedAudio: false,
-        mimeType: "audio/webm",
+        mimeType: 'audio/webm;codecs="opus"',
       }),
     );
     record.on("record-end", (blob: Blob) => {

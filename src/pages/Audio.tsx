@@ -27,7 +27,9 @@ const Audio = () => {
   const [existingTags, setExistingTags] = createSignal<Tag[] | null>(null);
   const createdAt = () => new Date(audio()?.created_at!).toLocaleString();
   const timer = setInterval(() => {
-    if (audio()?.transcription) {
+    const a = audio();
+    if (!a) return;
+    if (a.transcription !== null) {
       clearInterval(timer);
       return;
     }
@@ -120,14 +122,15 @@ const Audio = () => {
               </Stack>
               <Card
                 sx={{
-                  backgroundColor: audio().transcription
-                    ? "background.paper"
-                    : "#e0e0e0",
+                  backgroundColor:
+                    audio().transcription !== null
+                      ? "background.paper"
+                      : "#e0e0e0",
                 }}
               >
                 <CardContent>
                   <Show
-                    when={audio().transcription}
+                    when={audio().transcription !== null}
                     fallback={
                       <Typography fontStyle="italic">Processing</Typography>
                     }

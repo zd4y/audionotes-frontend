@@ -4,7 +4,7 @@ const CACHE_NAME = "audionotes";
 export interface Audio {
   id: number;
   length: number;
-  transcription: string;
+  transcription: string | null;
   created_at: string;
   tags: Tag[];
 }

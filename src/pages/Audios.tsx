@@ -61,7 +61,7 @@ const Audios = () => {
 
       for (let audio of audios()) {
         if (audio.id === audioId) {
-          if (audio.transcription) {
+          if (audio.transcription !== null) {
             clearInterval(newAudioTimer);
             return;
           }

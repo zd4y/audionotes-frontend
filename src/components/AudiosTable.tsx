@@ -95,9 +95,8 @@ const AudioTableRow: Component<{
   return (
     <TableRow
       sx={{
-        backgroundColor: props.audio.transcription
-          ? "background.paper"
-          : "#e0e0e0",
+        backgroundColor:
+          props.audio.transcription !== null ? "background.paper" : "#e0e0e0",
       }}
     >
       <TableCell padding="checkbox">
@@ -110,7 +109,7 @@ const AudioTableRow: Component<{
         sx={{ textDecoration: "none" }}
       >
         <Show
-          when={props.audio.transcription}
+          when={props.audio.transcription !== null}
           fallback={
             <Typography fontStyle="italic" fontSize="small">
               Processing

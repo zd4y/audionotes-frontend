@@ -33,12 +33,12 @@ const App: Component = () => {
       <Show when={!serverAvailable()}>
         <Alert severity="warning">Could not connect to server</Alert>
       </Show>
-      <Match when={authError()}>
+      <Show when={authError()}>
         <Alert severity="error">{authError()}</Alert>
-      </Match>
-      <Match when={authLoading()}>
+      </Show>
+      <Show when={authLoading()}>
         <PageProgress />
-      </Match>
+      </Show>
       <Router>
         <Routes>
           <Route path="/" component={Audios} />

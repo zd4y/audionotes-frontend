@@ -138,23 +138,27 @@ export async function deleteAudio(
 export async function newAudio(
   accessToken: string,
   blob: Blob,
-): Promise<{ error: string; info: string; id: number }> {
+): Promise<{ error: string; info: string; id: number | null }> {
   const { res, error } = await request("/audios", {
     method: "POST",
     accessToken,
     allowCache: false,
     body: blob,
     isJson: false,
+    contentType: "audio/webm",
   });
   if (error === "Offline") {
     return {
       error: "",
       info: "The audio will be uploaded once the connection is restored",
+      id: null,
     };
   }
-  const resData = await res?.json();
-  const id = resData.id;
-  return { error, info: "", id };
+  if (res) {
+    const resData = await res.json();
+    return { error, info: "", id: parseInt(resData.id) };
+  }
+  return { error, info: "", id: null };
 }
 
 export async function getTags(accessToken: string) {
@@ -260,6 +264,7 @@ const request = async (
     isJson = true,
     allowCache,
     getCached = false,
+    contentType,
   }: {
     method?: string;
     accessToken?: string;
@@ -267,10 +272,13 @@ const request = async (
     isJson?: boolean;
     allowCache: boolean;
     getCached?: boolean;
+    contentType?: string;
   },
 ): Promise<{ res: Response | null; error: string }> => {
   const headers: HeadersInit = {};
-  if (body && isJson !== false) {
+  if (contentType) {
+    headers["Content-Type"] = contentType;
+  } else if (body && isJson) {
     headers["Content-Type"] = "application/json";
   }
   if (accessToken) {

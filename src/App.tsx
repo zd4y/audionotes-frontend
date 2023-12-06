@@ -20,7 +20,7 @@ const Audio = lazy(() => import("./pages/Audio"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
 const App: Component = () => {
-  const { loading, error } = useAuth();
+  const { loading: authLoading, error: authError } = useAuth();
   const [serverAvailable, setServerAvailable] = createSignal(true);
 
   onMount(async () => {
@@ -29,30 +29,25 @@ const App: Component = () => {
   });
 
   return (
-    <Switch
-      fallback={
-        <>
-          <Show when={!serverAvailable()}>
-            <Alert severity="warning">Could not connect to server</Alert>
-          </Show>
-          <Router>
-            <Routes>
-              <Route path="/" component={Audios} />
-              <Route path="/:id" component={Audio} />
-              <Route path="/login" component={Auth} />
-              <Route path="/reset-password" component={ResetPassword} />
-            </Routes>
-          </Router>
-        </>
-      }
-    >
-      <Match when={error()}>
-        <Alert severity="error">{error()}</Alert>
+    <>
+      <Show when={!serverAvailable()}>
+        <Alert severity="warning">Could not connect to server</Alert>
+      </Show>
+      <Match when={authError()}>
+        <Alert severity="error">{authError()}</Alert>
       </Match>
-      <Match when={loading()}>
+      <Match when={authLoading()}>
         <PageProgress />
       </Match>
-    </Switch>
+      <Router>
+        <Routes>
+          <Route path="/" component={Audios} />
+          <Route path="/:id" component={Audio} />
+          <Route path="/login" component={Auth} />
+          <Route path="/reset-password" component={ResetPassword} />
+        </Routes>
+      </Router>
+    </>
   );
 };
 

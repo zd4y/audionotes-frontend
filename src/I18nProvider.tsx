@@ -29,7 +29,7 @@ export const I18nProvider: ParentComponent = (props) => {
   const [dict] = createResource(locale, fetchDictionary);
 
   onMount(() => {
-    const lang = navigator.language.substring(0, 3);
+    const lang = navigator.language.substring(0, 2);
     if (lang == "en" || lang == "es") {
       setLocale(lang);
     }

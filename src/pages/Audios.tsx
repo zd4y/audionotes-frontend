@@ -26,6 +26,7 @@ import { useLocation } from "@solidjs/router";
 import { GridView, Mic, Stop, ViewList } from "@suid/icons-material";
 import WaveSurfer from "wavesurfer.js";
 import RecordPlugin from "wavesurfer.js/plugins/record";
+import { useT } from "../I18nProvider";
 const AudiosGrid = lazy(() => import("../components/AudiosGrid"));
 const AudiosTable = lazy(() => import("../components/AudiosTable"));
 
@@ -43,6 +44,7 @@ const Audios = () => {
   const [inGridView, setInGridView] = createSignal(true);
   const onLargeScreen = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const location = useLocation();
+  const t = useT();
   let newAudioTimer = 0;
 
   createEffect(() => {
@@ -149,7 +151,7 @@ const Audios = () => {
     } else if (info) {
       setInfoMsg(info);
     } else {
-      setSuccessMsg("Recording saved successfully");
+      setSuccessMsg(t("Recording saved successfully"));
       await callGetAudios();
     }
   };
@@ -193,7 +195,7 @@ const Audios = () => {
             <Alert severity="info">{infoMsg()}</Alert>
           </Show>
           <Show when={uploading()}>
-            <Alert severity="info">Uploading audio...</Alert>
+            <Alert severity="info">{t("Uploading audio...")}</Alert>
           </Show>
         </Container>
         <Show
@@ -242,6 +244,7 @@ const RecordAudio: Component<{
 }> = (props) => {
   const [blob, setBlob] = createSignal<Blob | null>(null);
   const theme = useTheme();
+  const t = useT();
 
   let container: HTMLDivElement | undefined;
   let waveSurfer: WaveSurfer | null = null;
@@ -296,7 +299,7 @@ const RecordAudio: Component<{
 
   return (
     <Dialog open={props.open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Recording audio</DialogTitle>
+      <DialogTitle>{t("Recording audio")}</DialogTitle>
       <DialogContent>
         <div ref={container} />
       </DialogContent>

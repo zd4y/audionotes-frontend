@@ -21,6 +21,7 @@ import { AddCircle } from "@suid/icons-material";
 import { StackProps } from "@suid/material/Stack";
 import { SelectChangeEvent } from "@suid/material/Select";
 import { tagAudio as apiTagAudio } from "../api";
+import { useT } from "../I18nProvider";
 
 const Tags: Component<
   {
@@ -37,6 +38,7 @@ const Tags: Component<
   const [newTagColor, setNewTagColor] = createSignal("#2196f3");
   const [newTagName, setNewTagName] = createSignal("");
   const [newTagDialogOpen, setNewTagDialogOpen] = createSignal(false);
+  const t = useT();
   const rest = () => {
     const { tags: _, ...rest } = props;
     return rest;
@@ -91,13 +93,13 @@ const Tags: Component<
         open={newTagDialogOpen()}
         onClose={() => setNewTagDialogOpen(false)}
       >
-        <DialogTitle>Add tag</DialogTitle>
+        <DialogTitle>{t("Add tag")}</DialogTitle>
         <DialogContent>
           <Typography variant="h6" mb={1}>
-            Existing tag
+            {t("Existing tag")}
           </Typography>
           <FormControl fullWidth>
-            <InputLabel id="select-existing-tag-label">Tag</InputLabel>
+            <InputLabel id="select-existing-tag-label">{t("Tag")}</InputLabel>
             <Select
               value={selectedExistingTag()}
               id="nose"
@@ -117,7 +119,7 @@ const Tags: Component<
           </FormControl>
           <Divider />
           <Typography variant="h6" mt={2} mb={1}>
-            New tag
+            {t("New tag")}
           </Typography>
           <Stack>
             <Box mb={2}>
@@ -128,7 +130,7 @@ const Tags: Component<
                 onInput={(e) => setNewTagColor(e.currentTarget.value)}
               />
               <label for="color" style={{ "margin-left": "10px" }}>
-                Color
+                {t("Color")}
               </label>
             </Box>
             <TextField
@@ -139,7 +141,7 @@ const Tags: Component<
               onChange={(_, value) => setNewTagName(value)}
             />
             <Button sx={{ mt: 1 }} onClick={handleNewTagSave}>
-              Save
+              {t("Save")}
             </Button>
           </Stack>
         </DialogContent>

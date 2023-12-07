@@ -15,6 +15,7 @@ import {
 import { Delete } from "@suid/icons-material";
 import { A } from "@solidjs/router";
 import Tags from "./Tags";
+import { useT } from "../I18nProvider";
 
 const AudiosTable: Component<{
   audios: Audio[];
@@ -26,6 +27,7 @@ const AudiosTable: Component<{
   refreshAudios: () => void;
 }> = (props) => {
   const [existingTags, setExistingTags] = createSignal<Tag[] | null>(null);
+  const t = useT();
 
   onMount(async () => {
     const { tags, error } = await getTags(props.accessToken);
@@ -41,7 +43,7 @@ const AudiosTable: Component<{
       <TableContainer>
         <Table>
           <TableBody>
-            <For each={props.audios} fallback={<p>No audios found</p>}>
+            <For each={props.audios} fallback={<p>{t("No audios found.")}</p>}>
               {(audio) => (
                 <>
                   <AudioTableRow
@@ -75,6 +77,8 @@ const AudioTableRow: Component<{
   setLoading: (loading: boolean) => void;
   refreshAudios: () => void;
 }> = (props) => {
+  const t = useT();
+
   const handleDeleteButtonClick = async () => {
     props.setLoading(true);
     const { error, info } = await deleteAudio(
@@ -112,7 +116,7 @@ const AudioTableRow: Component<{
           when={props.audio.transcription !== null}
           fallback={
             <Typography fontStyle="italic" fontSize="small">
-              Processing
+              {t("Processing")}
             </Typography>
           }
         >

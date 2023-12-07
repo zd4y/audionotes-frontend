@@ -1,0 +1,28 @@
+export const dict = {
+  "Could not connect to server": "No ha sido posible conectarse al servidor",
+  "Forgot password?": "Olvidé mi contraseña",
+  "Log in": "Iniciar sesión",
+  email: "correo",
+  password: "contraseña",
+  "Passwords don't match.": "Las contraseñas no coinciden.",
+  "Password reset, you may now log in.":
+    "Contraseña restablecida, ahora puedes iniciar sesión.",
+  "If an account with that email exists, an email will be sent with a reset link.":
+    "Si una cuenta con ese correo existe, le llegará un correo con el link para restrablecer la contraseña.",
+  "new password": "nueva contraseña",
+  "confirm new password": "confirmar nueva contraseña",
+  Suggestions: "Sugerencias",
+  "Reset password": "Restablecer contraseña",
+  "Audio deleted successfully": "Audio eliminado con éxito",
+  Processing: "Procesando",
+  "Recording saved successfully": "Grabación guardada con éxito",
+  "Uploading audio...": "Subiendo audio...",
+  "Recording audio": "Grabando audio",
+  "Add tag": "Añadir etiqueta",
+  "Existing tag": "Etiqueta existente",
+  Tag: "Etiqueta",
+  "New tag": "Nueva etiqueta",
+  Color: "Color",
+  Save: "Guardar",
+  "No audios found.": "No fue encontrado ningún audio.",
+};

@@ -1,19 +1,12 @@
-import {
-  type Component,
-  Switch,
-  Match,
-  lazy,
-  onMount,
-  createSignal,
-  Show,
-} from "solid-js";
+import { type Component, lazy, onMount, createSignal, Show } from "solid-js";
 
 import { useAuth } from "./auth";
-import { Alert, Container } from "@suid/material";
+import { Alert } from "@suid/material";
 import { Route, Router, Routes } from "@solidjs/router";
 import Audios from "./pages/Audios";
 import { pingApi } from "./api";
 import PageProgress from "./components/PageProgress";
+import { useT } from "./I18nProvider";
 
 const Auth = lazy(() => import("./pages/Auth"));
 const Audio = lazy(() => import("./pages/Audio"));
@@ -22,6 +15,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const App: Component = () => {
   const { loading: authLoading, error: authError } = useAuth();
   const [serverAvailable, setServerAvailable] = createSignal(true);
+  const t = useT();
 
   onMount(async () => {
     const serverAvailable = await pingApi(3);
@@ -31,7 +25,7 @@ const App: Component = () => {
   return (
     <>
       <Show when={!serverAvailable()}>
-        <Alert severity="warning">Could not connect to server</Alert>
+        <Alert severity="warning">{t("Could not connect to server")}</Alert>
       </Show>
       <Show when={authError()}>
         <Alert severity="error">{authError()}</Alert>

@@ -12,6 +12,7 @@ import { Component, Show, createSignal } from "solid-js";
 import { authorize } from "../api";
 import { useAuth } from "../auth";
 import { A, Navigate, useLocation } from "@solidjs/router";
+import { useT } from "../I18nProvider";
 
 const Auth: Component = () => {
   const [email, setEmail] = createSignal("");
@@ -20,6 +21,7 @@ const Auth: Component = () => {
   const [loading, setLoading] = createSignal(false);
   const { login, accessToken } = useAuth();
   const location = useLocation();
+  const t = useT();
 
   const onSubmit = async (e: Event) => {
     e.preventDefault();
@@ -55,7 +57,7 @@ const Auth: Component = () => {
               required
               type="email"
               name="email"
-              label="email"
+              label={t("email")}
               value={email()}
               onChange={(_, value) => setEmail(value)}
               sx={{ bgcolor: "#fff" }}
@@ -64,7 +66,7 @@ const Auth: Component = () => {
               required
               type="password"
               name="password"
-              label="password"
+              label={t("password")}
               value={password()}
               onChange={(_, value) => setPassword(value)}
               sx={{ bgcolor: "#fff" }}
@@ -75,10 +77,10 @@ const Auth: Component = () => {
             <Show when={!loading()} fallback={<LinearProgress />}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <Button type="submit" variant="contained">
-                  Log in
+                  {t("Log in")}
                 </Button>
                 <Link href="/reset-password" component={A}>
-                  Forgot password?
+                  {t("Forgot password?")}
                 </Link>
               </Stack>
             </Show>

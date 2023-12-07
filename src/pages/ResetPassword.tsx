@@ -5,15 +5,14 @@ import {
   Container,
   LinearProgress,
   Link,
-  List,
-  ListItem,
   Stack,
   TextField,
   Typography,
 } from "@suid/material";
-import { For, Show, createSignal, onMount } from "solid-js";
+import { For, Show, createSignal } from "solid-js";
 import { requestResetPassword, resetPassword } from "../api";
 import { A, useSearchParams } from "@solidjs/router";
+import { useT } from "../I18nProvider";
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -25,6 +24,7 @@ const ResetPassword = () => {
   const [confirmNewPassword, setConfirmNewPassword] = createSignal("");
   const [warning, setWarning] = createSignal("");
   const [suggestions, setSuggestions] = createSignal<string[]>([]);
+  const t = useT();
 
   const onSubmit = async (event: Event) => {
     event.preventDefault();
@@ -35,7 +35,7 @@ const ResetPassword = () => {
     setSuggestions([]);
     if (searchParams.token && searchParams.user_id) {
       if (newPassword() !== confirmNewPassword()) {
-        setError("Passwords don't match.");
+        setError(t("Passwords don't match."));
         setLoading(false);
         return;
       }
@@ -46,7 +46,7 @@ const ResetPassword = () => {
       };
       const { reset, error, warning, suggestions } = await resetPassword(data);
       if (reset) {
-        setSuccessMsg("Password reset, you may now log in.");
+        setSuccessMsg(t("Password reset, you may now log in."));
       } else {
         setError(error);
         setWarning(warning);
@@ -57,7 +57,9 @@ const ResetPassword = () => {
       const { sent, error } = await requestResetPassword(email());
       if (sent) {
         setSuccessMsg(
-          "If an account with that email exists, an email will be sent with a reset link.",
+          t(
+            "If an account with that email exists, an email will be sent with a reset link.",
+          ),
         );
       } else {
         setError(error);
@@ -78,7 +80,7 @@ const ResetPassword = () => {
                 required
                 type="email"
                 name="email"
-                label="email"
+                label={t("email")}
                 value={email()}
                 onChange={(_, value) => setEmail(value)}
                 sx={{ bgcolor: "#fff" }}
@@ -89,7 +91,7 @@ const ResetPassword = () => {
               required
               type="password"
               name="new_password"
-              label="new password"
+              label={t("new password")}
               value={newPassword()}
               onChange={(_, value) => setNewPassword(value)}
               sx={{ bgcolor: "#fff" }}
@@ -97,7 +99,7 @@ const ResetPassword = () => {
             <TextField
               type="password"
               name="confirm_new_password"
-              label="confirm new password"
+              label={t("confirm new password")}
               value={confirmNewPassword()}
               onChange={(_, value) => setConfirmNewPassword(value)}
               sx={{ bgcolor: "#fff" }}
@@ -107,7 +109,7 @@ const ResetPassword = () => {
             </Show>
             <Show when={suggestions().length > 0}>
               <Alert severity="info">
-                <AlertTitle>Suggestions</AlertTitle>
+                <AlertTitle>{t("Suggestions")}</AlertTitle>
                 <For each={suggestions()}>
                   {(suggestion) => (
                     <Typography variant="body2" mb={1}>
@@ -127,10 +129,10 @@ const ResetPassword = () => {
             </Show>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Button variant="contained" type="submit">
-                Reset password
+                {t("Reset password")}
               </Button>
               <Link component={A} href="/login">
-                Log in
+                {t("Log in")}
               </Link>
             </Stack>
           </Show>

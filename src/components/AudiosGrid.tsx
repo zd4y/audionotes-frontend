@@ -9,6 +9,7 @@ import {
 } from "solid-js";
 import { Audio } from "../api";
 import { A } from "@solidjs/router";
+import { useT } from "../I18nProvider";
 
 const SPACE_BETWEEN_CARDS = 16;
 
@@ -16,6 +17,7 @@ const AudiosGrid: Component<{ audios: Audio[] }> = (props) => {
   let timeoutId = 0;
   const [containerMargin, setContainerMargin] = createSignal(0);
   const [audioCardSize, setAudioCardSize] = createSignal(0);
+  const t = useT();
 
   onMount(() => {
     calculateAudioCardSize();
@@ -73,7 +75,7 @@ const AudiosGrid: Component<{ audios: Audio[] }> = (props) => {
           each={props.audios}
           fallback={
             <Grid item>
-              <Typography>No audios found.</Typography>
+              <Typography>{t("No audios found.")}</Typography>
             </Grid>
           }
         >
@@ -89,6 +91,8 @@ const AudiosGrid: Component<{ audios: Audio[] }> = (props) => {
 };
 
 const AudioCard: Component<{ audio: Audio; size: number }> = (props) => {
+  const t = useT();
+
   return (
     <Link
       component={A}
@@ -108,7 +112,9 @@ const AudioCard: Component<{ audio: Audio; size: number }> = (props) => {
         <CardContent>
           <Show
             when={props.audio.transcription !== null}
-            fallback={<Typography fontStyle="italic">Processing</Typography>}
+            fallback={
+              <Typography fontStyle="italic">{t("Processing")}</Typography>
+            }
           >
             {props.audio.transcription}
           </Show>

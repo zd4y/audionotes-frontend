@@ -16,6 +16,7 @@ import PageProgress from "../components/PageProgress";
 import AudioPlayer from "../components/AudioPlayer";
 import { Delete } from "@suid/icons-material";
 import Tags from "../components/Tags";
+import { useT } from "../I18nProvider";
 
 const Audio = () => {
   const params = useParams();
@@ -26,6 +27,7 @@ const Audio = () => {
   const [audio, setAudio] = createSignal<ApiAudio | null>(null);
   const [existingTags, setExistingTags] = createSignal<Tag[] | null>(null);
   const createdAt = () => new Date(audio()?.created_at!).toLocaleString();
+  const t = useT();
   const timer = setInterval(() => {
     const a = audio();
     if (!a) return;
@@ -94,7 +96,7 @@ const Audio = () => {
     } else if (info) {
       navigate("/", { state: { infoMsg: info } });
     } else {
-      navigate("/", { state: { successMsg: "Audio deleted successfully" } });
+      navigate("/", { state: { successMsg: t("Audio deleted successfully") } });
     }
   };
 
@@ -132,7 +134,9 @@ const Audio = () => {
                   <Show
                     when={audio().transcription !== null}
                     fallback={
-                      <Typography fontStyle="italic">Processing</Typography>
+                      <Typography fontStyle="italic">
+                        {t("Processing")}
+                      </Typography>
                     }
                   >
                     {audio().transcription}
